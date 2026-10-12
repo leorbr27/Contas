@@ -38,8 +38,8 @@ button{border:0;border-radius:13px;height:46px;padding:0 16px;font-size:15px;fon
 <button class="ghost" id="cancelar" style="display:none;width:100%;margin-top:8px">Cancelar edição</button>
 </section>
 <section class="card" data-mode="expense"><div class="section-title"><span class="card-emoji">📊</span><span>Resumo</span></div><p class="section-description">Acompanhe o total e a quantidade de gastos exibidos conforme os filtros.</p><div class="summary"><div class="metric"><small>Total exibido</small><strong id="total">R$ 0,00</strong></div><div class="metric"><small>Quantidade</small><strong id="quantidade">0</strong></div></div></section>
-<section class="card" data-mode="expense"><div class="section-title"><span class="card-emoji">🔎</span><span>Filtros</span></div><p class="section-description">Refine os lançamentos por período, categoria e meio de pagamento.</p><div class="toolbar"><div><label for="fPeriodo">Período</label><select id="fPeriodo"></select></div><div><label for="fCategoria">Categoria</label><select id="fCategoria"><option value="">Todas</option></select></div><div><label for="fPagamento">Meio de pagamento</label><select id="fPagamento"><option value="">Todos</option></select></div></div></section>
-<section class="card" data-mode="expense"><div class="section-title"><span class="card-emoji">📈</span><span>Análises</span></div><p class="section-description">Visualize a distribuição dos gastos por categoria e meio de pagamento.</p><div class="charts"><div class="chart-card"><div class="chart-title">Gastos por categoria</div><div class="chart-wrap" id="chartCategoria"></div><div class="legend" id="legendCategoria"></div></div><div class="chart-card"><div class="chart-title">Gastos por meio de pagamento</div><div class="chart-wrap" id="chartPagamento"></div><div class="legend" id="legendPagamento"></div></div></div></section>
+
+
 <section class="card" data-mode="expense"><div class="section-title"><span class="card-emoji">🧾</span><span>Lançamentos</span></div><p class="section-description">Consulte os gastos registrados e edite ou exclua um lançamento quando necessário.</p><div id="lista"><div class="empty">Carregando gastos...</div></div></section>
 <section class="card" id="incomeCard" data-mode="income">
 <div class="section-title"><span class="card-emoji">💰</span><span>Novo recebimento</span></div>
@@ -90,17 +90,7 @@ button{border:0;border-radius:13px;height:46px;padding:0 16px;font-size:15px;fon
 <button class="primary" id="salvarTransferencia">Registrar transferência</button>
 <div id="listaTransferencias"><div class="empty">Nenhuma transferência registrada.</div></div>
 </section>
-<section class="card" data-mode="shared">
-<div class="section-title"><span class="card-emoji">📅</span><span>Fluxo de caixa</span></div>
-<p class="section-description">Projeção separada do dinheiro disponível, recebimentos previstos e compromissos futuros.</p>
-<div class="summary">
-<div class="metric"><small>Disponível hoje</small><strong id="fluxoLiquido">R$ 0,00</strong></div>
-<div class="metric"><small>Dívida atual dos cartões</small><strong id="fluxoCartao">R$ 0,00</strong></div>
-<div class="metric"><small>A receber em 30 dias</small><strong id="fluxoReceber">R$ 0,00</strong></div>
-<div class="metric"><small>Disponível projetado</small><strong id="fluxoProjetado">R$ 0,00</strong></div>
-</div>
-<div id="fluxoDetalhes" class="meta" style="margin-top:10px"></div>
-</section>
+
 <section class="card" data-mode="shared">
 <div class="section-title"><span class="card-emoji">🏦</span><span>Conciliação por CSV</span></div>
 <p class="section-description">Importe o extrato da conta bancária e compare automaticamente os lançamentos com gastos e recebimentos cadastrados.</p>
