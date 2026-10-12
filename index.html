@@ -229,6 +229,7 @@ if($("salvarCartao"))$("salvarCartao").onclick=async()=>{const name=$("cartaoNom
 function setMode(mode){
   const expense=mode==="expense";
   document.querySelectorAll("[data-mode]").forEach(el=>{el.classList.toggle("mode-hidden",el.dataset.mode!=="shared"&&el.dataset.mode!==mode)});
+  $("incomeCard").classList.toggle("mode-hidden",expense);
   $("modeExpense").classList.toggle("active",expense);
   $("modeIncome").classList.toggle("active",!expense);
   if(!expense)loadReceivables();
