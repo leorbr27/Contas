@@ -34,6 +34,14 @@
 <div id="listaFaturas"><div class="empty">Entre para consultar as faturas.</div></div>
 </section>
 
+
+<section class="card" data-mode="shared">
+<div class="section-title"><span class="card-emoji">💳</span><span>Meios de pagamento</span></div>
+<p class="section-description">Cadastre os meios de pagamento que ficarão disponíveis ao lançar um gasto.</p>
+<div class="grid"><div><label for="meioPagamentoNome">Novo meio de pagamento</label><input id="meioPagamentoNome" placeholder="Ex.: Pix, dinheiro, VA, Nubank"></div></div>
+<button class="secondary" id="salvarMeioPagamento" style="width:100%;margin-top:12px">Cadastrar meio de pagamento</button>
+</section>
+
 <section class="card" data-mode="shared">
 <div class="section-title"><span class="card-emoji">👤</span><span>Pessoas</span></div>
 <p class="section-description">Cadastre apenas nome e telefone para vincular uma pessoa aos recebimentos e facilitar cobranças.</p>
@@ -54,6 +62,8 @@ function fillAccountCardSelect(){const el=$("contaCartao");if(!el)return;el.inne
 async function loadCards(){const r=await api("/bootstrap");const d=r?.data&&typeof r.data==="object"?r.data:r;cards=Array.isArray(d?.cards)?d.cards:[];renderCards();fillAccountCardSelect()}
 function renderCards(){const el=$("listaCartoes");if(!el)return;el.innerHTML=cards.length?cards.map(c=>'<div class="item"><div><div class="desc">💳 '+esc(c.name)+'</div><div class="meta">Fechamento dia '+esc(c.closing_day||"—")+' · vencimento dia '+esc(c.due_day||"—")+' · limite '+brl(c.credit_limit||0)+'</div></div></div>').join(""):'<div class="empty">Nenhum cartão configurado.</div>'}
 async function loadPeople(){const r=await api("/people");people=Array.isArray(r?.people)?r.people:[];const el=$("listaPessoas");el.innerHTML=people.length?people.map(p=>'<div class="item"><div><div class="desc">'+esc(p.name)+'</div><div class="meta">'+esc(p.phone)+'</div></div></div>').join(""):'<div class="empty">Nenhuma pessoa cadastrada.</div>'}
+
+$("salvarMeioPagamento").onclick=async()=>{const name=$("meioPagamentoNome").value.trim();if(!name){alert("Informe o meio de pagamento.");return}try{await api("/cards",{method:"POST",body:JSON.stringify({name})});$("meioPagamentoNome").value="";await loadCards();status("Meio de pagamento cadastrado com sucesso.","ok")}catch(e){status(e.message)}};
 $("salvarPessoa").onclick=async()=>{const name=$("pessoaNome").value.trim(),phone=$("pessoaTelefone").value.trim();if(!name||!phone){alert("Informe nome e telefone.");return}try{await api("/people",{method:"POST",body:JSON.stringify({name,phone})});$("pessoaNome").value="";$("pessoaTelefone").value="";await loadPeople();status("Pessoa cadastrada com sucesso.","ok")}catch(e){status(e.message)}};
 $("salvarConta").onclick=async()=>{const name=$("contaNome").value.trim(),account_type=$("contaTipo").value,opening_balance=Number($("contaSaldo").value||0),card_id=Number($("contaCartao").value)||null;if(!name||!Number.isFinite(opening_balance)){alert("Informe o nome e um saldo inicial válido.");return}if(account_type==="credit_card"&&!card_id){alert("Selecione o cartão de crédito vinculado.");return}try{await api("/accounts",{method:"POST",body:JSON.stringify({name,account_type,opening_balance,card_id})});$("contaNome").value="";$("contaSaldo").value="";await loadAccounts();status("Conta cadastrada com sucesso.","ok")}catch(e){status(e.message)}};
 $("salvarCartao").onclick=async()=>{const name=$("cartaoNome").value.trim(),closing_day=Number($("cartaoFechamento").value)||null,due_day=Number($("cartaoVencimento").value)||null,credit_limit=Number($("cartaoLimite").value||0);if(!name||!credit_limit||!closing_day||!due_day){alert("Informe nome, fechamento, vencimento e limite do cartão.");return}try{await api("/cards",{method:"POST",body:JSON.stringify({name,closing_day,due_day,credit_limit})});$("cartaoNome").value="";$("cartaoFechamento").value="";$("cartaoVencimento").value="";$("cartaoLimite").value="";await loadCards();status("Cartão cadastrado com sucesso.","ok")}catch(e){status(e.message)}};
