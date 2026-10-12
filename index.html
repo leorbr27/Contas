@@ -59,6 +59,7 @@ body:not(.dashboard-page) #dashboardCard{display:none!important}
 <button class="primary" id="salvarRecebimento">Salvar recebimento</button>
 <button class="ghost" id="cancelarRecebimento" style="display:none;width:100%;margin-top:8px">Cancelar edição</button>
 </section>
+<section class="card" id="receivablesHistoryCard" data-mode="income"><div class="section-title"><span class="card-emoji">📜</span><span>Histórico de recebimentos</span></div><p class="section-description">Consulte os recebimentos previstos, parciais e concluídos, em cartões semelhantes aos históricos de gastos.</p><div id="listaRecebimentosHistorico"><div class="empty">Carregando recebimentos...</div></div></section>
 <section class="card" id="dashboardCard" data-mode="shared">
 <div class="section-title"><span class="card-emoji">📊</span><span>Dashboard financeiro</span></div>
 <p class="section-description">Visão consolidada do mês atual, saldo disponível, cartões, recebimentos e próximos compromissos.</p>
@@ -139,9 +140,14 @@ function renderReceivables(){
     const expected=Number(x.expected_amount||0),got=Number(x.received_amount||0),pending=Math.max(0,expected-got),status=pending<=0?"Recebido":got>0?"Parcial":String(x.due_date)<isoToday()?"Atrasado":"Pendente";
     const parcel=x.installment_total>1?' · Parcela '+x.installment_number+'/'+x.installment_total:"";
     const whatsapp=String(x.due_date)<isoToday()&&pending>0?'<button class="ghost" style="height:36px;padding:0 10px;font-size:12px" onclick="enviarWhatsAppRecebimento('+x.id+')">WhatsApp</button>':"";
-    const receiptControl=pending>0?'<select id="recebConta_'+x.id+'" style="height:36px;width:min(220px,100%)">'+accountOptions(x.account_id)+'</select><button class="ghost" style="height:36px;padding:0 10px;font-size:12px" onclick="registrarRecebimento('+x.id+','+pending+',true)">Receber parcial</button><button class="secondary" style="height:36px;padding:0 10px;font-size:12px" onclick="registrarRecebimento('+x.id+','+pending+',false)">Receber total</button>':'';
+    const receiptControl=pending>0?'<select id="recebConta_'+x.id+'" style="height:36px;width:min(220px,100%)">'+accountOptions(x.account_id)+'</select><button class="ghost" style="height:36px;padding:0 10px;font-size:12px" onclick="registrarRecebimento('+x.id+','+pending+',true)">Receber parcial</button><button class="secondary" style="height:36px;padding:0 10px;font-size:12px" onclick="registrarRecebimento('+x.id+','+pending+',false)">Receber total</button>':"";
     return '<div class="item"><div><div class="desc">'+esc(x.description)+'</div><div class="meta">Previsto: '+formatDate(x.due_date)+' · '+esc(x.category||"Outros")+' · '+status+parcel+'</div><div class="observation">Recebido: '+brl(got)+' · A receber: '+brl(pending)+(x.account_name?' · Destino: '+esc(x.account_name):"")+'</div></div><strong class="amount">'+brl(expected)+'</strong><div class="item-actions"><span class="payment">💰 '+esc(x.receiving_method||"Meio não informado")+'</span>'+receiptControl+whatsapp+'<button class="edit" title="Alterar recebimento" onclick="editarRecebimento('+x.id+')">✏️</button></div></div>'
-  }).join(""):'<div class="empty">Nenhum recebimento previsto para este mês.</div>'
+  }).join(""):'<div class="empty">Nenhum recebimento previsto para este mês.</div>';
+  $("listaRecebimentosHistorico").innerHTML=receivables.length?receivables.map(x=>{
+    const expected=Number(x.expected_amount||0),got=Number(x.received_amount||0),pending=Math.max(0,expected-got),status=pending<=0?"Recebido":got>0?"Parcial":String(x.due_date)<isoToday()?"Atrasado":"Pendente";
+    const parcel=x.installment_total>1?' · Parcela '+x.installment_number+'/'+x.installment_total:"";
+    return '<div class="item"><div><div class="desc">'+esc(x.description)+' <span class="badge">'+status+'</span></div><div class="meta">'+formatDate(x.due_date)+' · '+esc(x.category||"Outros")+parcel+'</div><div class="observation">Recebido: '+brl(got)+' · A receber: '+brl(pending)+'</div></div><strong class="amount">'+brl(expected)+'</strong><div class="item-actions"><span class="payment">💰 '+esc(x.receiving_method||"Meio não informado")+'</span><button class="edit" title="Alterar recebimento" aria-label="Alterar recebimento" onclick="editarRecebimento('+x.id+')">✏️</button></div></div>'
+  }).join(""):'<div class="empty">Nenhum recebimento encontrado neste mês.</div>';
 }
 window.registrarRecebimento=async(id,max,partial=true)=>{
   const select=$("recebConta_"+id),accountId=Number(select?.value)||null;
