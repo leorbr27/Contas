@@ -26,7 +26,7 @@ body:not(.dashboard-page) #dashboardCard{display:none!important}
 <body>
 <div class="container">
 <section class="card top-card"><header><div><h1>Meus gastos</h1><p>Controle por período, categoria e meio de pagamento.</p></div><div class="header-actions"><a class="ghost" href="./cadastros.html">Cadastros</a><a class="ghost" href="./Dashboard.html">Dashboard</a><a class="ghost" id="dividirConta" href="./dividir_conta/index.html">Dividir conta</a><button class="secondary" id="baixar">Baixar dados</button></div></header></section>
-<div id="status" class="status"></div><section class="mode-switch" aria-label="Tipo de lançamento"><button type="button" class="supercard active" id="modeExpense"><span>💸</span><strong>Gastos</strong><small>Despesas, análises, filtros e lançamentos</small></button><button type="button" class="supercard" id="modeIncome"><span>💰</span><strong>Recebimentos</strong><small>Valores previstos, recebidos e pendentes</small></button></section><section class="card" id="formCard" data-mode="expense">
+<div id="status" class="status"></div><section class="mode-switch" aria-label="Tipo de lançamento"><button type="button" class="supercard active" id="modeExpense" onclick="setMode(\'expense\')"><span>💸</span><strong>Gastos</strong><small>Despesas, análises, filtros e lançamentos</small></button><button type="button" class="supercard" id="modeIncome" onclick="setMode(\'income\')"><span>💰</span><strong>Recebimentos</strong><small>Valores previstos, recebidos e pendentes</small></button></section><section class="card" id="formCard" data-mode="expense">
 <div class="section-title" id="formTitle"><span class="card-emoji">💸</span><span>Novo gasto</span></div><p class="section-description">Cadastre uma nova despesa informando valor, data, categoria, pagamento e observação.</p>
 <div class="grid">
 <div class="full"><label for="descricao">Descrição</label><div class="barcode-action-row"><input id="descricao" placeholder="Ex.: supermercado, gasolina, internet"><button type="button" class="secondary" id="readBarcode">📷 Ler código de barras</button></div></div>
@@ -229,13 +229,15 @@ if($("salvarCartao"))$("salvarCartao").onclick=async()=>{const name=$("cartaoNom
 function setMode(mode){
   const expense=mode==="expense";
   document.querySelectorAll("[data-mode]").forEach(el=>{el.classList.toggle("mode-hidden",el.dataset.mode!=="shared"&&el.dataset.mode!==mode)});
-  $("incomeCard").classList.toggle("mode-hidden",expense);
+  const incomeCard=$("incomeCard");
+  if(incomeCard)incomeCard.classList.toggle("mode-hidden",expense);
   $("modeExpense").classList.toggle("active",expense);
   $("modeIncome").classList.toggle("active",!expense);
   if(!expense)loadReceivables();
 }
-$("modeExpense").onclick=()=>setMode("expense");
-$("modeIncome").onclick=()=>setMode("income");
+window.setMode=setMode;
+$("modeExpense").addEventListener("click",()=>setMode("expense"));
+$("modeIncome").addEventListener("click",()=>setMode("income"));
 function setAuthUI(){
   if($("entrar")) $("entrar").remove();
   if($("sair")) $("sair").remove();
