@@ -1,6 +1,6 @@
 (() => {
   // Configure este endereço após publicar a Neon Function. Não coloque DATABASE_URL aqui.
-  const API_BASE = '';
+  const API_BASE = 'https://br-late-shape-b52qxln0-contasapi.compute.c-7.us-east-2.aws.neon.tech';
   const $ = (s) => document.querySelector(s);
   const money = n => Number(n || 0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
   const today = () => { const d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,10); };
