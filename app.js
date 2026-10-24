@@ -8,7 +8,7 @@
   const dialog = $('#transaction-dialog'), form = $('#transaction-form');
 
   const authStyles = document.createElement('style');
-  authStyles.textContent = \`
+  authStyles.textContent = `
     .auth-overlay{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:24px;background:rgba(8,25,20,.78);backdrop-filter:blur(8px)}
     .auth-card{width:min(100%,420px);padding:32px;border-radius:22px;background:#fff;color:#172a23;box-shadow:0 25px 80px rgba(0,0,0,.28)}
     .auth-mark{display:flex;align-items:center;gap:12px;margin-bottom:24px;font-size:23px;font-weight:800;letter-spacing:-.6px}
@@ -20,7 +20,7 @@
     .auth-foot{font-size:12px;color:#64748b;margin-top:16px;text-align:center}
     #logout-button{margin-left:8px}.api-error-banner{padding:12px 16px;border-radius:10px;background:#fff1f2;color:#9f1239;margin:12px 0}
     .row-actions{white-space:nowrap}.danger-btn{color:#b91c1c}
-  \`;
+  `;
   document.head.appendChild(authStyles);
 
   function esc(value) {
@@ -45,7 +45,7 @@
       overlay = document.createElement('div');
       overlay.id = 'auth-overlay';
       overlay.className = 'auth-overlay';
-      overlay.innerHTML = \`
+      overlay.innerHTML = `
         <section class="auth-card" role="dialog" aria-modal="true" aria-labelledby="auth-title">
           <div class="auth-mark"><span class="auth-mark-icon">c.</span><span>contas.</span></div>
           <h2 id="auth-title">Seu dinheiro, em segurança.</h2>
@@ -57,7 +57,7 @@
             <button type="submit">Entrar com segurança</button>
           </form>
           <div class="auth-foot">A conexão é protegida e os dados ficam no banco de dados privado.</div>
-        </section>\`;
+        </section>`;
       document.body.appendChild(overlay);
       $('#auth-form').addEventListener('submit', async event => {
         event.preventDefault();
