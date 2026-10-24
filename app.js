@@ -52,7 +52,7 @@
     $('#expense-total').textContent = money(expense);
     $('#due-total').textContent = money(dueItems.reduce((sum, t) => sum + Number(t.amount), 0));
     $('#due-count').textContent = dueItems.length + (dueItems.length === 1 ? ' pendente' : ' pendentes');
-    $('#total-balance').textContent = money(accounts.reduce((sum, account) => sum + getBalance(account), 0));
+    $('#total-balance').textContent = money(accounts.reduce((sum, account) => sum + Number(account.initial_balance || 0), 0) + transactions.filter(t => t.paid).reduce((sum, t) => sum + (t.kind === 'income' ? Number(t.amount) : -Number(t.amount)), 0));
     renderTransactions();
     renderCategories(current);
     renderChart();
