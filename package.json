@@ -1,0 +1,12 @@
+{
+  "name": "contas-financas-pessoais",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Aplicativo de finanças pessoais Contas com API protegida e Neon PostgreSQL",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "pg": "^8.16.3"
+  }
+}
