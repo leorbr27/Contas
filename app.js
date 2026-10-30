@@ -114,13 +114,15 @@
 
   function populateSelects(selectedCategory, selectedAccount) {
     const kind = $('#kind').value;
+    const activeAccounts = accounts.filter(a => !a.archived);
     $('#category').innerHTML = '<option value="">Selecione uma categoria</option>' + categories
       .filter(c => c.kind === kind)
       .map(c => '<option value="' + esc(c.id) + '">' + esc(c.name) + '</option>').join('');
-    $('#account').innerHTML = '<option value="">Sem conta vinculada</option>' + accounts
-      .filter(a => !a.archived).map(a => '<option value="' + esc(a.id) + '">' + esc(a.name) + '</option>').join('');
+    $('#account').innerHTML = activeAccounts
+      .map(a => '<option value="' + esc(a.id) + '">' + esc(a.name) + '</option>').join('');
     if (selectedCategory) $('#category').value = selectedCategory;
-    if (selectedAccount) $('#account').value = selectedAccount;
+    const defaultAccount = activeAccounts.find(a => a.name.toLowerCase() === 'amex');
+    $('#account').value = selectedAccount || defaultAccount?.id || activeAccounts[0]?.id || '';
   }
   function getBalance(account) {
     return Number(account.initial_balance || 0) + transactions.filter(t => t.account_id === account.id && t.paid)
