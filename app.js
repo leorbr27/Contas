@@ -120,6 +120,8 @@
       .map(c => '<option value="' + esc(c.id) + '">' + esc(c.name) + '</option>').join('');
     $('#account').innerHTML = activeAccounts
       .map(a => '<option value="' + esc(a.id) + '">' + esc(a.name) + '</option>').join('');
+    $('#transfer-from-account').innerHTML = '<option value="">Selecione a conta de origem</option>' + activeAccounts
+      .map(a => '<option value="' + esc(a.id) + '">' + esc(a.name) + (a.type === 'credit_card' ? ' (cartão)' : '') + '</option>').join('');
     $('#transfer-to-account').innerHTML = '<option value="">Selecione a conta de destino</option>' + activeAccounts
       .map(a => '<option value="' + esc(a.id) + '">' + esc(a.name) + (a.type === 'credit_card' ? ' (cartão)' : '') + '</option>').join('');
     if (selectedCategory) $('#category').value = selectedCategory;
@@ -131,11 +133,12 @@
     const transfer = $('#kind').value === 'transfer';
     $('#category-field').hidden = transfer;
     $('#account-field').hidden = transfer;
+    $('#transfer-from-field').hidden = !transfer;
     $('#transfer-to-field').hidden = !transfer;
     $('.check-label').hidden = transfer;
   }
   function getBalance(account) {
-    const rows = transactions.filter(t => t.paid);
+    const rows = transactions.filter(t => t.paid || (account.type === 'credit_card' && t.account_id === account.id && t.kind === 'expense'));
     const isCard = account.type === 'credit_card';
     return Number(account.initial_balance || 0) + rows.reduce((sum, t) => {
       const amount = Number(t.amount);
@@ -232,6 +235,7 @@
     form.elements.paid.checked = transaction ? Boolean(transaction.paid) : true;
     form.elements.notes.value = transaction?.notes || '';
     populateSelects(transaction?.category_id, transaction?.account_id);
+    if (transaction?.transfer_from_account_id) $('#transfer-from-account').value = transaction.transfer_from_account_id;
     if (transaction?.transfer_to_account_id) $('#transfer-to-account').value = transaction.transfer_to_account_id;
     $('.dialog-head h2').textContent = editingId ? 'Editar lançamento' : 'Novo lançamento';
     form.querySelector('[type="submit"]').textContent = editingId ? 'Salvar alterações' : 'Salvar lançamento';
@@ -275,9 +279,9 @@
       transaction_date: form.elements.transaction_date.value,
       category_id: form.elements.category_id.value || null,
       account_id: form.elements.kind.value === 'transfer' ? null : (form.elements.account_id.value || null),
-      transfer_from_account_id: form.elements.kind.value === 'transfer' ? (form.elements.account_id.value || null) : null,
+      transfer_from_account_id: form.elements.kind.value === 'transfer' ? ($('#transfer-from-account').value || null) : null,
       transfer_to_account_id: form.elements.kind.value === 'transfer' ? ($('#transfer-to-account').value || null) : null,
-      paid: form.elements.kind.value === 'transfer' ? true : form.elements.paid.checked,
+      paid: form.elements.kind.value === 'transfer' ? true : (form.elements.paid.checked || accounts.find(a => a.id === form.elements.account_id.value)?.type === 'credit_card'),
       notes: form.elements.notes.value.trim()
     };
     if (!data.description || !Number.isFinite(data.amount) || data.amount <= 0 || !data.transaction_date || (data.kind === 'transfer' && (!data.transfer_from_account_id || !data.transfer_to_account_id || data.transfer_from_account_id === data.transfer_to_account_id))) {
