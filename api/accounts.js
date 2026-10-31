@@ -13,11 +13,14 @@ module.exports = async function handler(req, res) {
       INSERT INTO public.accounts (name, type, institution, initial_balance, color)
       SELECT seed.name, seed.type, seed.institution, 0, seed.color
       FROM (VALUES
-        ('Amex', 'credit_card', 'American Express', '#2563eb'),
+        ('Amex', 'credit_card', 'Bradesco', '#2563eb'),
         ('BB', 'checking', 'Banco do Brasil', '#eab308'),
+        ('BB - Cartão de crédito', 'credit_card', 'Banco do Brasil', '#eab308'),
         ('Bradesco', 'checking', 'Bradesco', '#dc2626'),
         ('Nubank', 'checking', 'Nubank', '#7c3aed'),
         ('PicPay', 'checking', 'PicPay', '#16a34a'),
+        ('PicPay - Cartão de crédito', 'credit_card', 'PicPay', '#16a34a'),
+        ('Itaú', 'checking', 'Itaú', '#f59e0b'),
         ('Santander', 'checking', 'Santander', '#ef4444'),
         ('Comprocard', 'credit_card', 'Comprocard', '#0f766e'),
         ('Le Card', 'credit_card', 'Le Card', '#0d9488')
@@ -27,13 +30,12 @@ module.exports = async function handler(req, res) {
         WHERE lower(existing.name) = lower(seed.name) AND existing.archived = false
       )
     `);
+    await db.query(`UPDATE public.accounts SET institution = 'Bradesco', updated_at = now() WHERE lower(name) = 'amex' AND archived = false`);
     const result = await db.query(`
       SELECT id, name, type, institution, initial_balance, color, archived
       FROM public.accounts
       WHERE archived = false
-      ORDER BY
-        CASE WHEN lower(name) IN ('comprocard', 'le card') THEN 1 ELSE 0 END,
-        lower(name)
+      ORDER BY lower(name)
     `);
     return res.status(200).json(result.rows);
   } catch (error) {
