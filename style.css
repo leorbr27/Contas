@@ -4,3 +4,5 @@
 [hidden]{display:none!important}.row-actions{white-space:nowrap}.danger-btn{color:#bd5547!important}.account-row{padding:12px 0;border-bottom:1px solid #f0f3f0}#extra-page{margin:0 0 15px}#extra-page .panel{margin-bottom:15px}@media(max-width:700px){.sidebar nav{max-width:65%;overflow-x:auto}.nav-item{flex:0 0 auto}.nav-item span{display:none}.row-actions .text-btn{padding:4px 2px}}
 
 .account-group{margin-top:18px}.account-group:first-child{margin-top:8px}.account-group h4{margin:0 0 10px;color:#65736b;font:800 11px 'DM Sans',sans-serif;letter-spacing:.7px;text-transform:uppercase}.account-row strong{font-size:12px;font-weight:800}.account-row .muted{margin-top:4px}
+
+.account-row:has(.pay-card-btn){grid-template-columns:30px minmax(0,1fr) auto auto}.pay-card-btn{padding:8px 10px;font-size:10px;white-space:nowrap}@media(max-width:700px){.account-row:has(.pay-card-btn){grid-template-columns:26px minmax(0,1fr) auto auto}.pay-card-btn{padding:7px 8px;font-size:9px}}
