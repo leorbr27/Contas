@@ -156,12 +156,12 @@
     const current = transactions.filter(t => String(t.transaction_date).slice(0, 7) === month);
     const income = current.filter(t => t.kind === 'income').reduce((sum, t) => sum + Number(t.amount), 0);
     const expense = current.filter(t => t.kind === 'expense').reduce((sum, t) => sum + Number(t.amount), 0);
-    const dueItems = transactions.filter(t => !t.paid && t.kind === 'expense');
+    const dueItems = transactions.filter(t => !t.paid && t.kind === 'expense' && accounts.find(a => a.id === t.account_id)?.type !== 'credit_card');
     $('#income-total').textContent = money(income);
     $('#expense-total').textContent = money(expense);
     $('#due-total').textContent = money(dueItems.reduce((sum, t) => sum + Number(t.amount), 0));
     $('#due-count').textContent = dueItems.length + (dueItems.length === 1 ? ' pendente' : ' pendentes');
-    $('#total-balance').textContent = money(accounts.reduce((sum, account) => sum + getBalance(account), 0));
+    $('#total-balance').textContent = money(accounts.reduce((sum, account) => sum + (account.type === 'credit_card' ? -getBalance(account) : getBalance(account)), 0));
     renderTransactions();
     renderCategories(current);
     renderChart();
