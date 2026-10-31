@@ -6,3 +6,7 @@
 .account-group{margin-top:18px}.account-group:first-child{margin-top:8px}.account-group h4{margin:0 0 10px;color:#65736b;font:800 11px 'DM Sans',sans-serif;letter-spacing:.7px;text-transform:uppercase}.account-row strong{font-size:12px;font-weight:800}.account-row .muted{margin-top:4px}
 
 .account-row:has(.pay-card-btn){grid-template-columns:30px minmax(0,1fr) auto auto}.pay-card-btn{padding:8px 10px;font-size:10px;white-space:nowrap}@media(max-width:700px){.account-row:has(.pay-card-btn){grid-template-columns:26px minmax(0,1fr) auto auto}.pay-card-btn{padding:7px 8px;font-size:9px}}
+
+
+/* Acessibilidade: amplia a interface e todas as fontes sem alterar componentes ou funcionalidades. */
+body{zoom:1.12}
