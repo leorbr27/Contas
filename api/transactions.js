@@ -30,7 +30,7 @@ function validate(body) {
 const selectSql = `SELECT t.id, t.account_id, t.category_id, t.kind, t.description, t.amount,
   to_char(t.transaction_date, 'YYYY-MM-DD') AS transaction_date,
   CASE WHEN t.due_date IS NULL THEN NULL ELSE to_char(t.due_date, 'YYYY-MM-DD') END AS due_date,
-  t.paid, t.paid_at, t.payment_method, t.notes, t.created_at, t.updated_at,
+  t.paid, t.paid_at, t.payment_method, t.notes, t.transfer_from_account_id, t.transfer_to_account_id, t.created_at, t.updated_at,
   c.name AS category_name, a.name AS account_name,
   fa.name AS transfer_from_account_name, ta.name AS transfer_to_account_name
   FROM public.transactions t
