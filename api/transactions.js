@@ -17,20 +17,27 @@ function validate(body) {
   if (!validDate(transaction_date)) return { error: 'Informe uma data válida.' };
   const category_id = data.category_id || null;
   const account_id = data.account_id || null;
+  const transfer_from_account_id = data.transfer_from_account_id || null;
+  const transfer_to_account_id = data.transfer_to_account_id || null;
   if (category_id && !validUuid(category_id)) return { error: 'Categoria inválida.' };
-  if (account_id && !validUuid(account_id)) return { error: 'Conta inválida.' };
+  if (kind === 'transfer') {
+    if (!validUuid(transfer_from_account_id) || !validUuid(transfer_to_account_id) || transfer_from_account_id === transfer_to_account_id) return { error: 'Selecione contas de origem e destino diferentes.' };
+  } else if (account_id && !validUuid(account_id)) return { error: 'Conta inválida.' };
   const notes = typeof data.notes === 'string' ? data.notes.trim().slice(0, 1000) : null;
-  return { data: { kind, description, amount: Math.round(amount * 100) / 100, transaction_date, paid, category_id, account_id, notes } };
+  return { data: { kind, description, amount: Math.round(amount * 100) / 100, transaction_date, paid, category_id: kind === 'transfer' ? null : category_id, account_id: kind === 'transfer' ? null : account_id, transfer_from_account_id, transfer_to_account_id, notes } };
 }
 
 const selectSql = `SELECT t.id, t.account_id, t.category_id, t.kind, t.description, t.amount,
   to_char(t.transaction_date, 'YYYY-MM-DD') AS transaction_date,
   CASE WHEN t.due_date IS NULL THEN NULL ELSE to_char(t.due_date, 'YYYY-MM-DD') END AS due_date,
   t.paid, t.paid_at, t.payment_method, t.notes, t.created_at, t.updated_at,
-  c.name AS category_name, a.name AS account_name
+  c.name AS category_name, a.name AS account_name,
+  fa.name AS transfer_from_account_name, ta.name AS transfer_to_account_name
   FROM public.transactions t
   LEFT JOIN public.categories c ON c.id = t.category_id
-  LEFT JOIN public.accounts a ON a.id = t.account_id`;
+  LEFT JOIN public.accounts a ON a.id = t.account_id
+  LEFT JOIN public.accounts fa ON fa.id = t.transfer_from_account_id
+  LEFT JOIN public.accounts ta ON ta.id = t.transfer_to_account_id`;
 
 module.exports = async function handler(req, res) {
   if (!requireAuth(req, res)) return;
@@ -46,10 +53,10 @@ module.exports = async function handler(req, res) {
       const d = checked.data;
       const result = await db.query(
         `INSERT INTO public.transactions
-          (kind, description, amount, transaction_date, category_id, account_id, paid, paid_at, notes, updated_at)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,CASE WHEN $7 THEN now() ELSE NULL END,$8,now())
+          (kind, description, amount, transaction_date, category_id, account_id, paid, paid_at, notes, transfer_from_account_id, transfer_to_account_id, updated_at)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,CASE WHEN $7 THEN now() ELSE NULL END,$8,$9,$10,now())
          RETURNING id, account_id, category_id, kind, description, amount, to_char(transaction_date,'YYYY-MM-DD') AS transaction_date, due_date, paid, paid_at, notes, created_at, updated_at`,
-        [d.kind, d.description, d.amount, d.transaction_date, d.category_id, d.account_id, d.paid, d.notes]
+        [d.kind, d.description, d.amount, d.transaction_date, d.category_id, d.account_id, d.paid, d.notes, d.transfer_from_account_id, d.transfer_to_account_id]
       );
       return res.status(201).json(result.rows[0]);
     }
@@ -63,10 +70,10 @@ module.exports = async function handler(req, res) {
       const result = await db.query(
         `UPDATE public.transactions SET kind=$1, description=$2, amount=$3, transaction_date=$4,
           category_id=$5, account_id=$6, paid=$7, paid_at=CASE WHEN $7 THEN COALESCE(paid_at, now()) ELSE NULL END,
-          notes=$8, updated_at=now()
+          notes=$8, transfer_from_account_id=$9, transfer_to_account_id=$10, updated_at=now()
          WHERE id=$9
          RETURNING id, account_id, category_id, kind, description, amount, to_char(transaction_date,'YYYY-MM-DD') AS transaction_date, due_date, paid, paid_at, notes, created_at, updated_at`,
-        [d.kind, d.description, d.amount, d.transaction_date, d.category_id, d.account_id, d.paid, d.notes, id]
+        [d.kind, d.description, d.amount, d.transaction_date, d.category_id, d.account_id, d.paid, d.notes, d.transfer_from_account_id, d.transfer_to_account_id, id]
       );
       if (!result.rowCount) return res.status(404).json({ error: 'Lançamento não encontrado.' });
       return res.status(200).json(result.rows[0]);
