@@ -71,7 +71,7 @@ module.exports = async function handler(req, res) {
         `UPDATE public.transactions SET kind=$1, description=$2, amount=$3, transaction_date=$4,
           category_id=$5, account_id=$6, paid=$7, paid_at=CASE WHEN $7 THEN COALESCE(paid_at, now()) ELSE NULL END,
           notes=$8, transfer_from_account_id=$9, transfer_to_account_id=$10, updated_at=now()
-         WHERE id=$9
+         WHERE id=$11
          RETURNING id, account_id, category_id, kind, description, amount, to_char(transaction_date,'YYYY-MM-DD') AS transaction_date, due_date, paid, paid_at, notes, created_at, updated_at`,
         [d.kind, d.description, d.amount, d.transaction_date, d.category_id, d.account_id, d.paid, d.notes, d.transfer_from_account_id, d.transfer_to_account_id, id]
       );
