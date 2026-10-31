@@ -120,9 +120,10 @@
       .map(c => '<option value="' + esc(c.id) + '">' + esc(c.name) + '</option>').join('');
     $('#account').innerHTML = activeAccounts
       .map(a => '<option value="' + esc(a.id) + '">' + esc(a.name) + '</option>').join('');
-    $('#transfer-from-account').innerHTML = '<option value="">Selecione a conta de origem</option>' + activeAccounts
+    const transferableAccounts = activeAccounts.filter(a => a.type !== 'benefit_card');
+    $('#transfer-from-account').innerHTML = '<option value="">Selecione a conta de origem</option>' + transferableAccounts
       .map(a => '<option value="' + esc(a.id) + '">' + esc(a.name) + (a.type === 'credit_card' ? ' (cartão)' : '') + '</option>').join('');
-    $('#transfer-to-account').innerHTML = '<option value="">Selecione a conta de destino</option>' + activeAccounts
+    $('#transfer-to-account').innerHTML = '<option value="">Selecione a conta de destino</option>' + transferableAccounts
       .map(a => '<option value="' + esc(a.id) + '">' + esc(a.name) + (a.type === 'credit_card' ? ' (cartão)' : '') + '</option>').join('');
     if (selectedCategory) $('#category').value = selectedCategory;
     const defaultAccount = activeAccounts.find(a => a.name.toLowerCase() === 'amex');
@@ -222,13 +223,14 @@
   function renderAccountsPage() {
     const target = $('#accounts-list');
     if (!target) return;
-    const bankAccounts = accounts.filter(a => a.type !== 'credit_card');
+    const bankAccounts = accounts.filter(a => !['credit_card', 'benefit_card'].includes(a.type));
     const cards = accounts.filter(a => a.type === 'credit_card');
-    const renderGroup = (items, title, card) => items.length ? '<section class="account-group"><h4>' + title + '</h4>' + items.map(a =>
-      '<div class="category-row account-row"><span class="category-icon">' + (card ? '▤' : '▣') + '</span><div><div class="category-name">' + esc(a.name) +
-      '</div><div class="muted">' + (card ? 'Cartão de crédito · Fatura em aberto' : 'Saldo inicial: ' + money(a.initial_balance)) + '</div></div><strong>' + money(getBalance(a)) +
-      '</strong>' + (card ? '<button type="button" class="secondary-btn pay-card-btn" data-pay-card="' + esc(a.id) + '">Pagar fatura</button>' : '') + '</div>').join('') + '</section>' : '';
-    target.innerHTML = accounts.length ? renderGroup(bankAccounts, 'Contas bancárias', false) + renderGroup(cards, 'Cartões de crédito', true) :
+    const benefitCards = accounts.filter(a => a.type === 'benefit_card');
+    const renderGroup = (items, title, mode) => items.length ? '<section class="account-group"><h4>' + title + '</h4>' + items.map(a =>
+      '<div class="category-row account-row"><span class="category-icon">' + (mode === 'credit' ? '▤' : mode === 'benefit' ? '▧' : '▣') + '</span><div><div class="category-name">' + esc(a.name) +
+      '</div><div class="muted">' + (mode === 'credit' ? 'Cartão de crédito · Fatura em aberto' : mode === 'benefit' ? 'Cartão alimentação · Saldo disponível' : 'Saldo inicial: ' + money(a.initial_balance)) + '</div></div><strong>' + money(getBalance(a)) +
+      '</strong>' + (mode === 'credit' ? '<button type="button" class="secondary-btn pay-card-btn" data-pay-card="' + esc(a.id) + '">Pagar fatura</button>' : '') + '</div>').join('') + '</section>' : '';
+    target.innerHTML = accounts.length ? renderGroup(bankAccounts, 'Contas bancárias', 'bank') + renderGroup(cards, 'Cartões de crédito', 'credit') + renderGroup(benefitCards, 'Cartões alimentação', 'benefit') :
       '<p class="empty-state">Nenhuma conta cadastrada.</p>';
   }
   function openDialog(transaction) {
