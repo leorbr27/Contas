@@ -22,8 +22,8 @@ module.exports = async function handler(req, res) {
         ('PicPay - Cartão de crédito', 'credit_card', 'PicPay', '#16a34a'),
         ('Itaú', 'checking', 'Itaú', '#f59e0b'),
         ('Santander', 'checking', 'Santander', '#ef4444'),
-        ('Comprocard', 'benefit_card', 'Comprocard', '#0f766e'),
-        ('Le Card', 'benefit_card', 'Le Card', '#0d9488')
+        ('Comprocard', 'other', 'Comprocard', '#0f766e'),
+        ('Le Card', 'other', 'Le Card', '#0d9488')
       ) AS seed(name, type, institution, color)
       WHERE NOT EXISTS (
         SELECT 1 FROM public.accounts existing
