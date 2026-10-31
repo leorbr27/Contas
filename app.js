@@ -127,6 +127,7 @@
     if (selectedCategory) $('#category').value = selectedCategory;
     const defaultAccount = activeAccounts.find(a => a.name.toLowerCase() === 'amex');
     $('#account').value = selectedAccount || defaultAccount?.id || activeAccounts[0]?.id || '';
+    $('#transfer-from-account').value = selectedAccount || activeAccounts.find(a => a.type !== 'credit_card')?.id || activeAccounts[0]?.id || '';
     updateKindFields();
   }
   function updateKindFields() {
@@ -226,7 +227,7 @@
     const renderGroup = (items, title, card) => items.length ? '<section class="account-group"><h4>' + title + '</h4>' + items.map(a =>
       '<div class="category-row account-row"><span class="category-icon">' + (card ? '▤' : '▣') + '</span><div><div class="category-name">' + esc(a.name) +
       '</div><div class="muted">' + (card ? 'Cartão de crédito · Fatura em aberto' : 'Saldo inicial: ' + money(a.initial_balance)) + '</div></div><strong>' + money(getBalance(a)) +
-      '</strong></div>').join('') + '</section>' : '';
+      '</strong>' + (card ? '<button type="button" class="secondary-btn pay-card-btn" data-pay-card="' + esc(a.id) + '">Pagar fatura</button>' : '') + '</div>').join('') + '</section>' : '';
     target.innerHTML = accounts.length ? renderGroup(bankAccounts, 'Contas bancárias', false) + renderGroup(cards, 'Cartões de crédito', true) :
       '<p class="empty-state">Nenhuma conta cadastrada.</p>';
   }
@@ -312,6 +313,12 @@
   });
 
   document.addEventListener('click', async event => {
+    const payCard = event.target.closest('[data-pay-card]');
+    if (payCard) {
+      const card = accounts.find(a => a.id === payCard.dataset.payCard);
+      if (card) openDialog({ kind: 'transfer', description: 'Pagamento da fatura - ' + card.name, amount: '', transaction_date: today(), paid: true, transfer_to_account_id: card.id });
+      return;
+    }
     const edit = event.target.closest('[data-edit]');
     if (edit) {
       const transaction = transactions.find(t => t.id === edit.dataset.edit);
