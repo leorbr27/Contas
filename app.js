@@ -112,6 +112,8 @@
     el.hidden = false;
   }
 
+  const isBenefitCard = account => ['comprocard', 'le card'].includes(String(account?.name || '').trim().toLowerCase());
+
   function populateSelects(selectedCategory, selectedAccount) {
     const kind = $('#kind').value;
     const activeAccounts = accounts.filter(a => !a.archived);
@@ -120,7 +122,7 @@
       .map(c => '<option value="' + esc(c.id) + '">' + esc(c.name) + '</option>').join('');
     $('#account').innerHTML = activeAccounts
       .map(a => '<option value="' + esc(a.id) + '">' + esc(a.name) + '</option>').join('');
-    const transferableAccounts = activeAccounts.filter(a => a.type !== 'benefit_card');
+    const transferableAccounts = activeAccounts.filter(a => !isBenefitCard(a));
     $('#transfer-from-account').innerHTML = '<option value="">Selecione a conta de origem</option>' + transferableAccounts
       .map(a => '<option value="' + esc(a.id) + '">' + esc(a.name) + (a.type === 'credit_card' ? ' (cartão)' : '') + '</option>').join('');
     $('#transfer-to-account').innerHTML = '<option value="">Selecione a conta de destino</option>' + transferableAccounts
@@ -223,9 +225,9 @@
   function renderAccountsPage() {
     const target = $('#accounts-list');
     if (!target) return;
-    const bankAccounts = accounts.filter(a => !['credit_card', 'benefit_card'].includes(a.type));
+    const bankAccounts = accounts.filter(a => a.type !== 'credit_card' && !isBenefitCard(a));
     const cards = accounts.filter(a => a.type === 'credit_card');
-    const benefitCards = accounts.filter(a => a.type === 'benefit_card');
+    const benefitCards = accounts.filter(isBenefitCard);
     const renderGroup = (items, title, mode) => items.length ? '<section class="account-group"><h4>' + title + '</h4>' + items.map(a =>
       '<div class="category-row account-row"><span class="category-icon">' + (mode === 'credit' ? '▤' : mode === 'benefit' ? '▧' : '▣') + '</span><div><div class="category-name">' + esc(a.name) +
       '</div><div class="muted">' + (mode === 'credit' ? 'Cartão de crédito · Fatura em aberto' : mode === 'benefit' ? 'Cartão alimentação · Saldo disponível' : 'Saldo inicial: ' + money(a.initial_balance)) + '</div></div><strong>' + money(getBalance(a)) +
