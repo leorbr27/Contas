@@ -18,6 +18,7 @@ module.exports = async function handler(req, res) {
         ('BB - Cartão de crédito', 'credit_card', 'Banco do Brasil', '#eab308'),
         ('Bradesco', 'checking', 'Bradesco', '#dc2626'),
         ('Nubank', 'checking', 'Nubank', '#7c3aed'),
+        ('Nubank - Cartão de crédito', 'credit_card', 'Nubank', '#7c3aed'),
         ('PicPay', 'checking', 'PicPay', '#16a34a'),
         ('PicPay - Cartão de crédito', 'credit_card', 'PicPay', '#16a34a'),
         ('Itaú', 'checking', 'Itaú', '#f59e0b'),
