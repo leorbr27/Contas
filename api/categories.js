@@ -8,12 +8,14 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Método não permitido.' });
   }
   try {
-    // Inclui as novas categorias de despesa de forma idempotente.
+    // Inclui categorias de despesas e rendimentos sem duplicar registros existentes.
     await db.query(`
       INSERT INTO public.categories (name, kind, color, icon, is_default)
       VALUES
         ('Lanche', 'expense', '#f59e0b', 'utensils', true),
-        ('Impostos e taxas', 'expense', '#64748b', 'receipt', true)
+        ('Impostos e taxas', 'expense', '#64748b', 'receipt', true),
+        ('Reembolso', 'income', '#0d9488', 'wallet', true),
+        ('Vendas', 'income', '#16a34a', 'shopping-bag', true)
       ON CONFLICT (name, kind) DO NOTHING
     `);
     const result = await db.query('SELECT id, name, kind, color, icon, is_default FROM public.categories ORDER BY kind, name');
