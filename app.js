@@ -221,10 +221,14 @@
   function renderAccountsPage() {
     const target = $('#accounts-list');
     if (!target) return;
-    target.innerHTML = accounts.length ? accounts.map(a =>
-      '<div class="category-row account-row"><span class="category-icon">▣</span><div><div class="category-name">' + esc(a.name) +
-      '</div><div class="muted">Saldo inicial: ' + money(a.initial_balance) + '</div></div><strong>' + money(getBalance(a)) +
-      '</strong></div>').join('') : '<p class="empty-state">Nenhuma conta cadastrada.</p>';
+    const bankAccounts = accounts.filter(a => a.type !== 'credit_card');
+    const cards = accounts.filter(a => a.type === 'credit_card');
+    const renderGroup = (items, title, card) => items.length ? '<section class="account-group"><h4>' + title + '</h4>' + items.map(a =>
+      '<div class="category-row account-row"><span class="category-icon">' + (card ? '▤' : '▣') + '</span><div><div class="category-name">' + esc(a.name) +
+      '</div><div class="muted">' + (card ? 'Cartão de crédito · Fatura em aberto' : 'Saldo inicial: ' + money(a.initial_balance)) + '</div></div><strong>' + money(getBalance(a)) +
+      '</strong></div>').join('') + '</section>' : '';
+    target.innerHTML = accounts.length ? renderGroup(bankAccounts, 'Contas bancárias', false) + renderGroup(cards, 'Cartões de crédito', true) :
+      '<p class="empty-state">Nenhuma conta cadastrada.</p>';
   }
   function openDialog(transaction) {
     form.reset(); clearError(); editingId = transaction?.id || null;
