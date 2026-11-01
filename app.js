@@ -270,6 +270,7 @@
     const max = Math.max(1, ...buckets.map(b => b.total));
     const chart = $('#chart-bars');
     chart.classList.add('daily-bar-chart');
+    chart.style.setProperty('--bar-count', Math.max(1, buckets.length));
     chart.innerHTML = buckets.map(b =>
       '<div class="daily-bar-column" title="Dia ' + b.day + ': ' + money(b.total) + '">' +
         '<strong class="daily-bar-value">' + (b.total ? money(b.total).replace(',00','') : '—') + '</strong>' +
