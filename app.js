@@ -253,12 +253,14 @@
   }
   function renderChart() {
     const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-    const now = new Date(), months = [];
-    for (let i = 5; i >= 0; i--) {
-      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    const range = dashboardDateRange(), start = new Date(range.from + 'T00:00:00'), finish = new Date(range.to + 'T00:00:00'), months = [];
+    let cursor = new Date(start.getFullYear(), start.getMonth(), 1);
+    const last = new Date(finish.getFullYear(), finish.getMonth(), 1);
+    while (cursor <= last && months.length < 24) {
+      const key = cursor.getFullYear() + '-' + String(cursor.getMonth() + 1).padStart(2, '0');
       const rows = (dashboardRows || transactions).filter(t => String(t.transaction_date).slice(0, 7) === key);
-      months.push({ label: monthNames[d.getMonth()], income: rows.filter(t => t.kind === 'income').reduce((s, t) => s + Number(t.amount), 0), expense: rows.filter(t => t.kind === 'expense').reduce((s, t) => s + Number(t.amount), 0) });
+      months.push({ label: monthNames[cursor.getMonth()] + (months.length === 0 || cursor.getMonth() === 0 ? ' ' + String(cursor.getFullYear()).slice(-2) : ''), income: rows.filter(t => t.kind === 'income').reduce((s, t) => s + Number(t.amount), 0), expense: rows.filter(t => t.kind === 'expense').reduce((s, t) => s + Number(t.amount), 0) });
+      cursor.setMonth(cursor.getMonth() + 1);
     }
     const max = Math.max(1, ...months.flatMap(m => [m.income, m.expense]));
     $('#chart-bars').innerHTML = months.map(m =>
@@ -426,7 +428,19 @@
   ['dash-period','dash-account','dash-category','dash-kind','dash-status'].forEach(id => $('#'+id)?.addEventListener('change', () => { if(id==='dash-period' && $('#dash-period').value!=='custom') { } render(); }));
   ['dash-start','dash-end'].forEach(id => $('#'+id)?.addEventListener('change', () => { $('#dash-period').value='custom'; render(); }));
   $('#reset-dashboard-filters')?.addEventListener('click', () => { $('#dash-period').value='month'; $('#dash-account').value=''; $('#dash-category').value=''; $('#dash-kind').value=''; $('#dash-status').value=''; render(); });
-  $('#month-label').textContent = new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }).replace(/^./, c => c.toUpperCase()) + '⌄';
+  const localToday = today();
+  $('#today-label').textContent = new Date(localToday + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }).replace(/^./, c => c.toUpperCase());
+  $('#month-label').value = localToday.slice(0, 7);
+  $('#month-label').addEventListener('change', () => {
+    const selected = $('#month-label').value;
+    if (!selected) return;
+    const [year, month] = selected.split('-').map(Number);
+    const lastDay = new Date(year, month, 0).getDate();
+    $('#dash-period').value = 'custom';
+    $('#dash-start').value = selected + '-01';
+    $('#dash-end').value = selected + '-' + String(lastDay).padStart(2, '0');
+    render();
+  });
 
   const logout = document.createElement('button');
   logout.type = 'button';
