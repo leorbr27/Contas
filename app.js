@@ -4,7 +4,7 @@
   const money = value => Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   const today = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); };
   const uid = () => (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2);
-  let transactions = [], categories = [], accounts = [], editingId = null, busy = false;
+  let transactions = [], categories = [], accounts = [], editingId = null, busy = false, dashboardRows = [];
   const dialog = $('#transaction-dialog'), form = $('#transaction-form');
 
   const authStyles = document.createElement('style');
@@ -155,24 +155,69 @@
       return sum + (t.kind === 'income' ? amount : t.kind === 'expense' ? -amount : 0);
     }, 0);
   }
+  function dashboardDateRange() {
+    const now = new Date(), iso = d => { const x = new Date(d); x.setMinutes(x.getMinutes() - x.getTimezoneOffset()); return x.toISOString().slice(0,10); };
+    const period = $('#dash-period')?.value || 'month';
+    let from = new Date(now.getFullYear(), now.getMonth(), 1), to = new Date(now.getFullYear(), now.getMonth()+1, 0);
+    if (period === 'last-month') { from = new Date(now.getFullYear(), now.getMonth()-1, 1); to = new Date(now.getFullYear(), now.getMonth(), 0); }
+    else if (period === '30' || period === '90') { from = new Date(now); from.setDate(from.getDate() - (Number(period)-1)); to = now; }
+    else if (period === 'year') { from = new Date(now.getFullYear(),0,1); to = new Date(now.getFullYear(),11,31); }
+    else if (period === 'all') { const dates = transactions.map(t => String(t.transaction_date || '').slice(0,10)).filter(Boolean).sort(); from = dates.length ? new Date(dates[0]+'T00:00:00') : new Date(now.getFullYear(),now.getMonth(),1); to = now; }
+    else if (period === 'custom') { from = $('#dash-start')?.value ? new Date($('#dash-start').value+'T00:00:00') : new Date(now.getFullYear(),now.getMonth(),1); to = $('#dash-end')?.value ? new Date($('#dash-end').value+'T00:00:00') : now; }
+    if ($('#dash-start') && period !== 'custom') $('#dash-start').value = iso(from);
+    if ($('#dash-end') && period !== 'custom') $('#dash-end').value = iso(to);
+    return { from: iso(from), to: iso(to) };
+  }
+  function populateDashboardFilters() {
+    const account = $('#dash-account'), category = $('#dash-category');
+    if (!account || !category) return;
+    const oldAccount = account.value, oldCategory = category.value;
+    account.innerHTML = '<option value="">Todas as contas</option>' + accounts.filter(a => !a.archived).map(a => '<option value="'+esc(a.id)+'">'+esc(a.name)+'</option>').join('');
+    category.innerHTML = '<option value="">Todas as categorias</option>' + categories.map(c => '<option value="'+esc(c.id)+'">'+esc(c.name)+'</option>').join('');
+    account.value = oldAccount; category.value = oldCategory;
+  }
+  function getDashboardRows() {
+    const range = dashboardDateRange(), account = $('#dash-account')?.value || '', category = $('#dash-category')?.value || '';
+    const kind = $('#dash-kind')?.value || '', status = $('#dash-status')?.value || '';
+    return transactions.filter(t => {
+      const date = String(t.transaction_date || '').slice(0,10);
+      if (date < range.from || date > range.to) return false;
+      if (account && (t.kind === 'transfer' ? t.transfer_from_account_id !== account && t.transfer_to_account_id !== account : t.account_id !== account)) return false;
+      if (category && t.category_id !== category) return false;
+      if (kind && t.kind !== kind) return false;
+      if (status === 'paid' && !t.paid) return false;
+      if (status === 'pending' && t.paid) return false;
+      return true;
+    });
+  }
   function render() {
-    const month = today().slice(0, 7);
-    const current = transactions.filter(t => String(t.transaction_date).slice(0, 7) === month);
-    const income = current.filter(t => t.kind === 'income').reduce((sum, t) => sum + Number(t.amount), 0);
-    const expense = current.filter(t => t.kind === 'expense').reduce((sum, t) => sum + Number(t.amount), 0);
-    const dueItems = transactions.filter(t => !t.paid && t.kind === 'expense' && accounts.find(a => a.id === t.account_id)?.type !== 'credit_card');
+    populateDashboardFilters();
+    dashboardRows = getDashboardRows();
+    const income = dashboardRows.filter(t => t.kind === 'income').reduce((sum,t)=>sum+Number(t.amount),0);
+    const expense = dashboardRows.filter(t => t.kind === 'expense').reduce((sum,t)=>sum+Number(t.amount),0);
+    const dueItems = dashboardRows.filter(t => !t.paid && t.kind === 'expense' && accounts.find(a=>a.id===t.account_id)?.type !== 'credit_card');
+    const selectedAccount = $('#dash-account')?.value;
+    const balanceAccounts = selectedAccount ? accounts.filter(a=>a.id===selectedAccount) : accounts;
     $('#income-total').textContent = money(income);
     $('#expense-total').textContent = money(expense);
-    $('#due-total').textContent = money(dueItems.reduce((sum, t) => sum + Number(t.amount), 0));
+    $('#due-total').textContent = money(dueItems.reduce((sum,t)=>sum+Number(t.amount),0));
     $('#due-count').textContent = dueItems.length + (dueItems.length === 1 ? ' pendente' : ' pendentes');
-    $('#total-balance').textContent = money(accounts.reduce((sum, account) => sum + (account.type === 'credit_card' ? -getBalance(account) : getBalance(account)), 0));
-    renderTransactions();
-    renderCategories(current);
-    renderChart();
-    renderAccountsPage();
+    $('#total-balance').textContent = money(balanceAccounts.reduce((sum,a)=>sum+(a.type==='credit_card'?-getBalance(a):getBalance(a)),0));
+    const result = income-expense, savings = income > 0 ? result/income*100 : 0;
+    $('#dashboard-filter-summary').textContent = 'Exibindo '+dashboardRows.length+' lançamento(s), de '+new Date(dashboardDateRange().from+'T00:00:00').toLocaleDateString('pt-BR')+' até '+new Date(dashboardDateRange().to+'T00:00:00').toLocaleDateString('pt-BR')+'.';
+    renderTransactions(); renderCategories(dashboardRows); renderChart(); renderAccountsPage(); renderDashboardInsights(dashboardRows,income,expense,result,savings);
+  }
+  function renderDashboardInsights(rows,income,expense,result,savings) {
+    const accountTotals = {};
+    rows.filter(t=>t.kind==='expense').forEach(t=>{ const a=accounts.find(x=>x.id===t.account_id); const name=t.account_name||a?.name||'Conta não identificada'; accountTotals[name]=(accountTotals[name]||0)+Number(t.amount); });
+    const pairs=Object.entries(accountTotals).sort((a,b)=>b[1]-a[1]);
+    $('#dash-account-breakdown').innerHTML=pairs.length?pairs.slice(0,6).map(([name,value])=>'<div class="insight-row"><span>'+esc(name)+'</span><strong>'+money(value)+'</strong></div>').join(''):'<p class="empty-state">Sem despesas neste filtro.</p>';
+    const top=rows.filter(t=>t.kind==='expense').sort((a,b)=>Number(b.amount)-Number(a.amount)).slice(0,5);
+    $('#dash-top-expenses').innerHTML=top.length?top.map(t=>'<div class="insight-row"><span>'+esc(t.description||'Despesa')+'<small>'+esc(t.category_name||categories.find(c=>c.id===t.category_id)?.name||'Sem categoria')+'</small></span><strong>'+money(t.amount)+'</strong></div>').join(''):'<p class="empty-state">Nenhuma despesa encontrada.</p>';
+    $('#dash-result-card').innerHTML='<strong class="'+(result>=0?'positive':'amount-expense')+'">'+money(result)+'</strong><div class="result-meta"><span>Receitas: '+money(income)+'</span><span>Despesas: '+money(expense)+'</span><span>Economia sobre receitas: '+(Number.isFinite(savings)?savings.toFixed(1).replace('.',','):'0,0')+'%</span></div>';
   }
   function renderTransactions() {
-    const list = [...transactions].sort((a, b) => String(b.transaction_date).localeCompare(String(a.transaction_date)));
+    const list = [...(dashboardRows || transactions)].sort((a, b) => String(b.transaction_date).localeCompare(String(a.transaction_date)));
     const recent = list.slice(0, 7);
     $('#recent-list').innerHTML = recent.length ? recent.map(t => transactionRow(t)).join('') :
       '<tr><td colspan="6" class="empty-state">Nenhum lançamento cadastrado. Clique em “Novo lançamento” para começar.</td></tr>';
@@ -212,7 +257,7 @@
     for (let i = 5; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
-      const rows = transactions.filter(t => String(t.transaction_date).slice(0, 7) === key);
+      const rows = (dashboardRows || transactions).filter(t => String(t.transaction_date).slice(0, 7) === key);
       months.push({ label: monthNames[d.getMonth()], income: rows.filter(t => t.kind === 'income').reduce((s, t) => s + Number(t.amount), 0), expense: rows.filter(t => t.kind === 'expense').reduce((s, t) => s + Number(t.amount), 0) });
     }
     const max = Math.max(1, ...months.flatMap(m => [m.income, m.expense]));
@@ -376,6 +421,9 @@
     if (all) renderTransactions();
   }
   document.querySelectorAll('[data-page]').forEach(el => el.addEventListener('click', () => showPage(el.dataset.page)));
+  ['dash-period','dash-account','dash-category','dash-kind','dash-status'].forEach(id => $('#'+id)?.addEventListener('change', () => { if(id==='dash-period' && $('#dash-period').value!=='custom') { } render(); }));
+  ['dash-start','dash-end'].forEach(id => $('#'+id)?.addEventListener('change', () => { $('#dash-period').value='custom'; render(); }));
+  $('#reset-dashboard-filters')?.addEventListener('click', () => { $('#dash-period').value='month'; $('#dash-account').value=''; $('#dash-category').value=''; $('#dash-kind').value=''; $('#dash-status').value=''; render(); });
   $('#month-label').textContent = new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }).replace(/^./, c => c.toUpperCase()) + '⌄';
 
   const logout = document.createElement('button');
