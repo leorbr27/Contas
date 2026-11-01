@@ -218,12 +218,14 @@
   }
   function renderTransactions() {
     const list = [...(dashboardRows || transactions)].sort((a, b) => String(b.transaction_date).localeCompare(String(a.transaction_date)));
-    const recent = list.slice(0, 7);
-    $('#recent-list').innerHTML = recent.length ? recent.map(t => transactionRow(t)).join('') :
-      '<tr><td colspan="6" class="empty-state">Nenhum lançamento cadastrado. Clique em “Novo lançamento” para começar.</td></tr>';
-    const allBody = $('#all-transactions-body');
-    if (allBody) allBody.innerHTML = list.length ? list.map(t => transactionRow(t)).join('') :
-      '<tr><td colspan="6" class="empty-state">Nenhum lançamento cadastrado.</td></tr>';
+    const allPage = document.querySelector('.nav-item.active')?.dataset.page === 'lancamentos';
+    const visible = allPage ? list : list.slice(0, 7);
+    $('#recent-list').innerHTML = visible.length ? visible.map(t => transactionRow(t)).join('') :
+      '<tr><td colspan="6" class="empty-state">' + (allPage ? 'Nenhum lançamento encontrado no período selecionado.' : 'Nenhum lançamento cadastrado. Clique em “Novo lançamento” para começar.') + '</td></tr>';
+    if (allPage) {
+      const subtitle = $('.transactions-panel .panel-heading p');
+      if (subtitle) subtitle.textContent = 'Exibindo todos os ' + list.length + ' lançamento(s) do período selecionado.';
+    }
   }
   function transactionRow(t) {
     const cat = categories.find(c => c.id === t.category_id);
