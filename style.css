@@ -229,3 +229,67 @@ footer{font-size:14px;padding-top:28px}
  .metric-card strong{font-size:19px}
  .topbar h1{font-size:25px}
 }
+
+
+/* Gráfico diário: uma barra vertical para cada dia do período */
+.daily-bar-chart{
+  display:flex;
+  align-items:stretch;
+  gap:7px;
+  min-height:250px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:18px 4px 8px;
+  border-bottom:1px solid #e6ece8;
+  scrollbar-width:thin;
+}
+.daily-bar-column{
+  flex:0 0 38px;
+  min-width:38px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+}
+.daily-bar-value{
+  display:block;
+  width:100%;
+  min-height:17px;
+  overflow:hidden;
+  color:#66766d;
+  font-size:10px;
+  font-weight:650;
+  text-align:center;
+  white-space:nowrap;
+  text-overflow:clip;
+}
+.daily-bar-track{
+  width:24px;
+  height:170px;
+  display:flex;
+  align-items:flex-end;
+  overflow:hidden;
+  border-radius:7px 7px 2px 2px;
+  background:#f0f4f1;
+}
+.daily-bar-track i{
+  display:block;
+  width:100%;
+  min-height:0;
+  border-radius:7px 7px 2px 2px;
+  background:linear-gradient(180deg,#42a779 0%,#176447 100%);
+}
+.daily-bar-day{
+  color:#52645a;
+  font-size:12px;
+  font-weight:700;
+  line-height:1;
+}
+@media(max-width:700px){
+  .daily-bar-chart{gap:5px;min-height:220px;padding-top:14px}
+  .daily-bar-column{flex-basis:32px;min-width:32px;gap:7px}
+  .daily-bar-track{width:21px;height:145px}
+  .daily-bar-value{font-size:9px}
+  .daily-bar-day{font-size:11px}
+}
