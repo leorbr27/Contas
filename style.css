@@ -293,3 +293,27 @@ footer{font-size:14px;padding-top:28px}
   .daily-bar-value{font-size:9px}
   .daily-bar-day{font-size:11px}
 }
+
+
+/* Filtros recolhíveis para liberar espaço no painel */
+.dashboard-filters{padding:0;overflow:hidden}
+.dashboard-filter-toggle{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:17px 22px;cursor:pointer;list-style:none}
+.dashboard-filter-toggle::-webkit-details-marker{display:none}
+.dashboard-filter-toggle>span:first-child{display:grid;gap:3px}
+.dashboard-filter-toggle strong{font-size:17px;color:#172b25}
+.dashboard-filter-toggle small{font-size:13px;color:#53665c}
+.dashboard-filter-toggle-actions{display:flex;align-items:center;gap:9px;color:#176b4d;font-size:14px;font-weight:750;white-space:nowrap}
+.filter-chevron{font-size:22px;line-height:1;transition:transform .2s}
+.dashboard-filters[open] .filter-chevron{transform:rotate(180deg)}
+.dashboard-filters[open] .filter-toggle-label{font-size:0}
+.dashboard-filters[open] .filter-toggle-label:after{content:"Ocultar filtros";font-size:14px}
+.dashboard-filter-content{padding:0 22px 19px}
+.dashboard-filter-content .panel-heading{margin:0}
+.dashboard-filter-content .panel-heading p{margin:0}
+@media(max-width:700px){
+ .dashboard-filter-toggle{padding:15px}
+ .dashboard-filter-toggle strong{font-size:16px}
+ .dashboard-filter-toggle small{font-size:12px}
+ .dashboard-filter-toggle-actions{font-size:13px}
+ .dashboard-filter-content{padding:0 15px 16px}
+}
