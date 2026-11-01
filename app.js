@@ -252,7 +252,7 @@
     groups.forEach(([name,value],i)=>{ const end=total ? cursor+value/total*100 : cursor; stops.push(colors[i]+' '+cursor+'% '+end+'%'); cursor=end; });
     const chart = $('#category-list');
     if (!groups.length) { chart.innerHTML='<p class="empty-state">Não há despesas neste período para montar a distribuição.</p>'; return; }
-    chart.innerHTML='<div class="category-visual"><div class="category-donut" style="background:conic-gradient('+stops.join(',')+')"><div class="category-donut-center"><strong>'+money(total)+'</strong><small>Total gasto</small></div></div><div class="category-legend">'+groups.map(([name,value],i)=>'<div class="category-legend-row"><i style="background:'+colors[i]+'"></i><span>'+esc(name)+'</span><strong>'+((value/total)*100).toFixed(1).replace('.',',')+'%</strong><small>'+money(value)+'</small></div>').join('')+'</div></div>';
+    chart.innerHTML='<div class="category-visual"><div class="category-donut" style="background:conic-gradient('+stops.join(',')+')"><div class="category-donut-center"><strong>'+money(total)+'</strong><small>Total gasto</small></div></div><div class="category-legend">'+groups.map(([name,value],i)=>'<div class="category-legend-row"><i style="background:'+colors[i]+'"></i><span>'+esc(name)+'</span><strong>'+((value/total)*100).toFixed(1).replace('.',',')+'% · '+money(value)+'</strong></div>').join('')+'</div></div>';
   }
   function renderChart() {
     const range = dashboardDateRange();
