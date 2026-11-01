@@ -15,19 +15,25 @@
 <header class="topbar"><div><div class="eyebrow" id="today-label"></div><h1 id="page-title">Visão geral</h1></div><div class="top-actions"><label class="month-picker-label" for="month-label">Mês <input class="month-picker" id="month-label" type="month" aria-label="Selecionar mês"></label><button class="primary-btn" id="new-transaction">＋ Novo lançamento</button></div></header>
 <section class="welcome"><div><div class="eyebrow light">SEU RESUMO FINANCEIRO</div><h2>Bom planejamento começa<br>com clareza.</h2><p>Acompanhe seu dinheiro e mantenha seus objetivos no caminho certo.</p></div><div class="welcome-art" aria-hidden="true"><div class="art-circle c1"></div><div class="art-circle c2"></div><div class="art-card"><span>Saldo do mês</span><b>R$ 4.280,50</b><div class="art-line"><i></i></div><small>+12,8% neste mês</small></div></div></section>
 
-<section class="panel dashboard-filters" aria-label="Filtros do dashboard">
-  <div class="panel-heading"><div><h3>Personalize sua análise</h3><p>Os indicadores e gráficos abaixo acompanham estes filtros</p></div><button type="button" class="text-btn" id="reset-dashboard-filters">Limpar filtros ↺</button></div>
-  <div class="dashboard-filter-grid">
-    <label>Período<select id="dash-period"><option value="month">Este mês</option><option value="last-month">Mês passado</option><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="year">Este ano</option><option value="all">Todo o período</option><option value="custom">Personalizado</option></select></label>
-    <label>Data inicial<input id="dash-start" type="date"></label>
-    <label>Data final<input id="dash-end" type="date"></label>
-    <label>Conta<select id="dash-account"><option value="">Todas as contas</option></select></label>
-    <label>Categoria<select id="dash-category"><option value="">Todas as categorias</option></select></label>
-    <label>Movimentação<select id="dash-kind"><option value="">Todas</option><option value="income">Receitas</option><option value="expense">Despesas</option><option value="transfer">Transferências</option></select></label>
-    <label>Situação<select id="dash-status"><option value="">Todas</option><option value="paid">Pagos/recebidos</option><option value="pending">Pendentes</option></select></label>
+<details class="panel dashboard-filters" aria-label="Filtros do dashboard">
+  <summary class="dashboard-filter-toggle">
+    <span><strong>Personalize sua análise</strong><small>Toque para mostrar ou ocultar os filtros</small></span>
+    <span class="dashboard-filter-toggle-actions"><span class="filter-toggle-label">Mostrar filtros</span><span class="filter-chevron" aria-hidden="true">⌄</span></span>
+  </summary>
+  <div class="dashboard-filter-content">
+    <div class="panel-heading"><div><p>Os indicadores e gráficos abaixo acompanham estes filtros</p></div><button type="button" class="text-btn" id="reset-dashboard-filters">Limpar filtros ↺</button></div>
+    <div class="dashboard-filter-grid">
+      <label>Período<select id="dash-period"><option value="month">Este mês</option><option value="last-month">Mês passado</option><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="year">Este ano</option><option value="all">Todo o período</option><option value="custom">Personalizado</option></select></label>
+      <label>Data inicial<input id="dash-start" type="date"></label>
+      <label>Data final<input id="dash-end" type="date"></label>
+      <label>Conta<select id="dash-account"><option value="">Todas as contas</option></select></label>
+      <label>Categoria<select id="dash-category"><option value="">Todas as categorias</option></select></label>
+      <label>Movimentação<select id="dash-kind"><option value="">Todas</option><option value="income">Receitas</option><option value="expense">Despesas</option><option value="transfer">Transferências</option></select></label>
+      <label>Situação<select id="dash-status"><option value="">Todas</option><option value="paid">Pagos/recebidos</option><option value="pending">Pendentes</option></select></label>
+    </div>
+    <div class="filter-summary" id="dashboard-filter-summary">Exibindo todos os lançamentos do período selecionado.</div>
   </div>
-  <div class="filter-summary" id="dashboard-filter-summary">Exibindo todos os lançamentos do período selecionado.</div>
-</section>
+</details>
 
 <section class="metrics">
 <article class="metric-card"><div class="metric-top"><span>Saldo total</span><span class="metric-icon green">↗</span></div><strong id="total-balance">R$ 0,00</strong><small class="muted">Em todas as contas</small><div class="mini-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></article>
