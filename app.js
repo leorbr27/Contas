@@ -396,6 +396,8 @@
     const overview = page === 'inicio', all = page === 'lancamentos', accountPage = page === 'contas';
     const extra = $('#extra-page');
     $('.welcome').hidden = !overview;
+    $('.dashboard-filters').hidden = !overview;
+    $('.dashboard-insights').hidden = !overview;
     $('.metrics').hidden = !overview;
     $('.content-grid').hidden = !overview;
     $('.transactions-panel').hidden = !(overview || all);
