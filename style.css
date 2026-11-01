@@ -317,3 +317,39 @@ footer{font-size:14px;padding-top:28px}
  .dashboard-filter-toggle-actions{font-size:13px}
  .dashboard-filter-content{padding:0 15px 16px}
 }
+
+
+/* Todas as barras do mês visíveis simultaneamente, sem rolagem horizontal */
+.daily-bar-chart{
+  display:grid;
+  grid-template-columns:repeat(var(--bar-count, 31), minmax(0, 1fr));
+  align-items:end;
+  gap:3px;
+  min-height:220px;
+  overflow-x:hidden;
+  overflow-y:hidden;
+  padding:18px 2px 8px;
+}
+.daily-bar-column{
+  min-width:0;
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
+  gap:7px;
+}
+.daily-bar-value{display:none}
+.daily-bar-track{width:min(100%, 20px);height:155px;flex:0 0 auto}
+.daily-bar-day{font-size:clamp(7px, .8vw, 11px);line-height:1}
+@media(max-width:700px){
+  .daily-bar-chart{gap:2px;min-height:190px;padding:14px 0 7px}
+  .daily-bar-column{gap:6px}
+  .daily-bar-track{width:min(78%, 12px);height:135px}
+  .daily-bar-day{font-size:8px;letter-spacing:-.4px}
+}
+@media(max-width:390px){
+  .daily-bar-chart{gap:1px}
+  .daily-bar-track{width:75%;height:125px}
+  .daily-bar-day{font-size:7px}
+}
