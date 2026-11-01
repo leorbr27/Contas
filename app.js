@@ -255,35 +255,35 @@
     chart.innerHTML='<div class="category-visual"><div class="category-donut" style="background:conic-gradient('+stops.join(',')+')"><div class="category-donut-center"><strong>'+money(total)+'</strong><small>Total gasto</small></div></div><div class="category-legend">'+groups.map(([name,value],i)=>'<div class="category-legend-row"><i style="background:'+colors[i]+'"></i><span>'+esc(name)+'</span><strong>'+((value/total)*100).toFixed(1).replace('.',',')+'%</strong><small>'+money(value)+'</small></div>').join('')+'</div></div>';
   }
   function renderChart() {
-    const monthNames=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-    const range=dashboardDateRange(), start=new Date(range.from+'T00:00:00'), finish=new Date(range.to+'T00:00:00');
-    const expenseRows=(dashboardRows||transactions).filter(t=>t.kind==='expense');
-    const incomeRows=(dashboardRows||transactions).filter(t=>t.kind==='income');
-    let buckets=[];
-    if(start.getFullYear()===finish.getFullYear()&&start.getMonth()===finish.getMonth()){
-      const days=Math.ceil((finish-start)/86400000)+1, count=Math.min(5,Math.max(1,Math.ceil(days/7)));
-      for(let i=0;i<count;i++){
-        const from=new Date(start); from.setDate(start.getDate()+i*7);
-        const to=new Date(Math.min(finish.getTime(),from.getTime()+6*86400000));
-        buckets.push({label:'Sem. '+(i+1),from,to});
-      }
-    } else {
-      let cursor=new Date(start.getFullYear(),start.getMonth(),1), last=new Date(finish.getFullYear(),finish.getMonth(),1);
-      while(cursor<=last&&buckets.length<24){ const from=new Date(cursor),to=new Date(cursor.getFullYear(),cursor.getMonth()+1,0); buckets.push({label:monthNames[cursor.getMonth()]+'/'+String(cursor.getFullYear()).slice(-2),from,to}); cursor.setMonth(cursor.getMonth()+1); }
+    const range = dashboardDateRange();
+    const start = new Date(range.from + 'T00:00:00');
+    const finish = new Date(range.to + 'T00:00:00');
+    const expenseRows = (dashboardRows || transactions).filter(t => t.kind === 'expense');
+    const buckets = [];
+    for (let day = new Date(start); day <= finish; day.setDate(day.getDate() + 1)) {
+      const date = new Date(day);
+      const key = [date.getFullYear(), String(date.getMonth()+1).padStart(2,'0'), String(date.getDate()).padStart(2,'0')].join('-');
+      const total = expenseRows.filter(t => String(t.transaction_date || '').slice(0,10) === key)
+        .reduce((sum,t) => sum + Number(t.amount), 0);
+      buckets.push({ day: date.getDate(), total });
     }
-    buckets.forEach(b=>{
-      const from=b.from.toISOString().slice(0,10),to=b.to.toISOString().slice(0,10);
-      const sum=(rows)=>rows.filter(t=>{const d=String(t.transaction_date||'').slice(0,10);return d>=from&&d<=to;}).reduce((s,t)=>s+Number(t.amount),0);
-      b.income=sum(incomeRows);b.expense=sum(expenseRows);b.result=b.income-b.expense;
-    });
-    const max=Math.max(1,...buckets.flatMap(b=>[b.income,b.expense]));
-    const chart=$('#chart-bars');
-    chart.innerHTML=buckets.map(b=>'<div class="flow-period"><div class="flow-period-heading"><strong>'+b.label+'</strong><span class="'+(b.result>=0?'positive':'amount-expense')+'">'+(b.result>=0?'Sobrou ':'Faltou ')+money(Math.abs(b.result))+'</span></div><div class="flow-track"><i class="flow-income" style="width:'+(b.income/max*100)+'%"></i></div><div class="flow-track"><i class="flow-expense" style="width:'+(b.expense/max*100)+'%"></i></div><div class="flow-period-values"><span>Entrou <b>'+money(b.income)+'</b></span><span>Saiu <b>'+money(b.expense)+'</b></span></div></div>').join('')||'<p class="empty-state">Sem movimentações para este período.</p>';
-    const totalIn=buckets.reduce((s,b)=>s+b.income,0),totalOut=buckets.reduce((s,b)=>s+b.expense,0);
-    const insight=$('#flow-chart-insight');
-    if(insight) insight.textContent=totalIn||totalOut ? (totalIn>=totalOut?'No período, suas receitas superaram as despesas em ':'Suas despesas superaram as receitas em ')+money(Math.abs(totalIn-totalOut))+'.' : 'Ainda não há receitas ou despesas neste período.';
-    const legend=$('#flow-chart-legend');
-    if(legend) legend.innerHTML='<span><i class="legend-income"></i> Receitas</span><span><i class="legend-expense"></i> Despesas</span>';
+    const max = Math.max(1, ...buckets.map(b => b.total));
+    const chart = $('#chart-bars');
+    chart.classList.add('daily-bar-chart');
+    chart.innerHTML = buckets.map(b =>
+      '<div class="daily-bar-column" title="Dia ' + b.day + ': ' + money(b.total) + '">' +
+        '<strong class="daily-bar-value">' + (b.total ? money(b.total).replace(',00','') : '—') + '</strong>' +
+        '<div class="daily-bar-track"><i style="height:' + (b.total / max * 100) + '%"></i></div>' +
+        '<span class="daily-bar-day">' + b.day + '</span>' +
+      '</div>'
+    ).join('') || '<p class="empty-state">Sem dias neste período.</p>';
+    const totalOut = buckets.reduce((sum,b) => sum + b.total, 0);
+    const insight = $('#flow-chart-insight');
+    if (insight) insight.textContent = totalOut
+      ? 'Total de despesas no período: ' + money(totalOut) + '. Cada barra representa o valor gasto em um dia.'
+      : 'Ainda não há despesas neste período.';
+    const legend = $('#flow-chart-legend');
+    if (legend) legend.innerHTML = '<span><i class="legend-expense"></i> Despesas por dia</span>';
   }
   function renderAccountsPage() {
     const target = $('#accounts-list');
