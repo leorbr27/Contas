@@ -37,3 +37,35 @@ body{zoom:1.12}
 .month-picker-label .month-picker{border:0;background:transparent;padding:10px 0;color:#45554c;font:600 13px 'DM Sans',sans-serif;min-width:125px;cursor:pointer}
 .month-picker-label .month-picker:focus{outline:2px solid #429a6c55;outline-offset:2px;border-radius:4px}
 @media(max-width:700px){.month-picker-label{padding:0 7px;justify-content:center}.month-picker-label .month-picker{padding:8px 0;min-width:112px;font-size:11px}}
+
+/* Gráficos analíticos: valores, proporções e leitura direta */
+.chart-grid-new{grid-template-columns:minmax(0,1.45fr) minmax(300px,1fr);align-items:stretch}
+.chart-panel,.category-panel{min-height:330px}
+.flow-chart-legend{display:flex;gap:12px;flex-wrap:wrap;color:#75837a;font-size:11px}
+.flow-chart-legend span{display:flex;align-items:center;gap:5px}
+.flow-chart-legend i{width:9px;height:9px;border-radius:3px;display:inline-block}
+.chart-insight{margin:18px 0 12px;padding:12px 14px;border-radius:9px;background:#eff7f1;color:#315c45;font-size:13px;font-weight:700;line-height:1.5}
+.flow-period-list{display:grid;gap:15px}
+.flow-period{padding:0 0 13px;border-bottom:1px solid #edf1ee}
+.flow-period:last-child{border-bottom:0}
+.flow-period-heading,.flow-period-values{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.flow-period-heading{font-size:12px;margin-bottom:8px}
+.flow-period-heading span{font-size:11px;font-weight:700}
+.flow-track{height:10px;background:#f0f3f0;border-radius:8px;overflow:hidden;margin:5px 0}
+.flow-track i{display:block;height:100%;border-radius:8px;min-width:0}
+.flow-income{background:#27865d}.flow-expense{background:#e4a18f}
+.flow-period-values{font-size:10px;color:#87938c;margin-top:7px}
+.flow-period-values b{color:#3b4b42;font-size:11px;margin-left:3px}
+.category-visual{display:grid;grid-template-columns:150px minmax(0,1fr);align-items:center;gap:18px;margin-top:22px}
+.category-donut{width:148px;height:148px;border-radius:50%;display:grid;place-items:center;position:relative}
+.category-donut-center{width:91px;height:91px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.category-donut-center strong{font:800 13px Manrope;color:#24382d;max-width:82px;overflow-wrap:anywhere}
+.category-donut-center small{font-size:9px;color:#89958e;margin-top:4px}
+.category-legend{display:grid;gap:11px;min-width:0}
+.category-legend-row{display:grid;grid-template-columns:9px minmax(0,1fr) auto;gap:6px;align-items:center;font-size:10px}
+.category-legend-row i{width:8px;height:8px;border-radius:3px}
+.category-legend-row span{overflow-wrap:anywhere;color:#53645a}
+.category-legend-row strong{font-size:10px}
+.category-legend-row small{grid-column:2/4;color:#8a968e;font-size:10px}
+@media(max-width:1000px){.chart-grid-new{grid-template-columns:1fr}}
+@media(max-width:700px){.category-visual{grid-template-columns:1fr;justify-items:center}.category-legend{width:100%}.chart-insight{font-size:12px}.flow-period-values{flex-wrap:wrap}}
