@@ -14,6 +14,21 @@
 <main class="main">
 <header class="topbar"><div><div class="eyebrow">SEGUNDA-FEIRA, 12 DE OUTUBRO</div><h1 id="page-title">Visão geral</h1></div><div class="top-actions"><button class="month-picker" id="month-label">Outubro 2026⌄</button><button class="primary-btn" id="new-transaction">＋ Novo lançamento</button></div></header>
 <section class="welcome"><div><div class="eyebrow light">SEU RESUMO FINANCEIRO</div><h2>Bom planejamento começa<br>com clareza.</h2><p>Acompanhe seu dinheiro e mantenha seus objetivos no caminho certo.</p></div><div class="welcome-art" aria-hidden="true"><div class="art-circle c1"></div><div class="art-circle c2"></div><div class="art-card"><span>Saldo do mês</span><b>R$ 4.280,50</b><div class="art-line"><i></i></div><small>+12,8% neste mês</small></div></div></section>
+
+<section class="panel dashboard-filters" aria-label="Filtros do dashboard">
+  <div class="panel-heading"><div><h3>Personalize sua análise</h3><p>Os indicadores e gráficos abaixo acompanham estes filtros</p></div><button type="button" class="text-btn" id="reset-dashboard-filters">Limpar filtros ↺</button></div>
+  <div class="dashboard-filter-grid">
+    <label>Período<select id="dash-period"><option value="month">Este mês</option><option value="last-month">Mês passado</option><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="year">Este ano</option><option value="all">Todo o período</option><option value="custom">Personalizado</option></select></label>
+    <label>Data inicial<input id="dash-start" type="date"></label>
+    <label>Data final<input id="dash-end" type="date"></label>
+    <label>Conta<select id="dash-account"><option value="">Todas as contas</option></select></label>
+    <label>Categoria<select id="dash-category"><option value="">Todas as categorias</option></select></label>
+    <label>Movimentação<select id="dash-kind"><option value="">Todas</option><option value="income">Receitas</option><option value="expense">Despesas</option><option value="transfer">Transferências</option></select></label>
+    <label>Situação<select id="dash-status"><option value="">Todas</option><option value="paid">Pagos/recebidos</option><option value="pending">Pendentes</option></select></label>
+  </div>
+  <div class="filter-summary" id="dashboard-filter-summary">Exibindo todos os lançamentos do período selecionado.</div>
+</section>
+
 <section class="metrics">
 <article class="metric-card"><div class="metric-top"><span>Saldo total</span><span class="metric-icon green">↗</span></div><strong id="total-balance">R$ 0,00</strong><small class="muted">Em todas as contas</small><div class="mini-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></article>
 <article class="metric-card"><div class="metric-top"><span>Receitas do mês</span><span class="metric-icon mint">↓</span></div><strong class="positive" id="income-total">R$ 0,00</strong><small class="muted">Entradas registradas</small><div class="metric-foot positive">↗ <span>Dinheiro que entrou</span></div></article>
@@ -23,6 +38,13 @@
 <section class="content-grid"><article class="panel chart-panel"><div class="panel-heading"><div><h3>Fluxo financeiro</h3><p>Compare receitas e despesas</p></div><span class="legend"><i class="legend-income"></i> Receitas <i class="legend-expense"></i> Despesas</span></div><div class="chart" id="flow-chart"><div class="chart-y"><span>R$ 6 mil</span><span>R$ 4 mil</span><span>R$ 2 mil</span><span>R$ 0</span></div><div class="chart-area"><div class="chart-grid"><i></i><i></i><i></i><i></i></div><div class="bars" id="chart-bars"><div class="bar-group"><i class="bar income-bar" style="height:42%"></i><i class="bar expense-bar" style="height:28%"></i><small>Mai</small></div><div class="bar-group"><i class="bar income-bar" style="height:58%"></i><i class="bar expense-bar" style="height:37%"></i><small>Jun</small></div><div class="bar-group"><i class="bar income-bar" style="height:49%"></i><i class="bar expense-bar" style="height:46%"></i><small>Jul</small></div><div class="bar-group"><i class="bar income-bar" style="height:72%"></i><i class="bar expense-bar" style="height:42%"></i><small>Ago</small></div><div class="bar-group"><i class="bar income-bar" style="height:64%"></i><i class="bar expense-bar" style="height:34%"></i><small>Set</small></div><div class="bar-group"><i class="bar income-bar" style="height:83%"></i><i class="bar expense-bar" style="height:51%"></i><small>Out</small></div></div></div></div></article>
 <article class="panel"><div class="panel-heading"><div><h3>Despesas por categoria</h3><p>Onde seu dinheiro vai</p></div><button class="text-btn" data-page="lancamentos">Ver tudo ↗</button></div><div id="category-list" class="category-list"><div class="empty-state">Seus gastos por categoria aparecerão aqui quando você registrar lançamentos.</div></div></article></section>
 <section class="panel transactions-panel"><div class="panel-heading"><div><h3>Últimos lançamentos</h3><p>Movimentações recentes da sua vida financeira</p></div><button class="text-btn" data-page="lancamentos">Ver lançamentos ↗</button></div><div class="table-wrap"><table><thead><tr><th>DESCRIÇÃO</th><th>CATEGORIA</th><th>DATA</th><th>CONTA</th><th>VALOR</th></tr></thead><tbody id="recent-list"><tr><td colspan="5" class="empty-state">Nenhum lançamento cadastrado. Clique em “Novo lançamento” para começar.</td></tr></tbody></table></div></section>
+
+<section class="dashboard-insights">
+  <article class="panel insight-panel"><div class="panel-heading"><div><h3>Despesas por conta</h3><p>Distribuição das saídas no período</p></div></div><div id="dash-account-breakdown" class="insight-list"></div></article>
+  <article class="panel insight-panel"><div class="panel-heading"><div><h3>Maiores despesas</h3><p>Seus maiores lançamentos de saída</p></div></div><div id="dash-top-expenses" class="insight-list"></div></article>
+  <article class="panel insight-panel"><div class="panel-heading"><div><h3>Resultado financeiro</h3><p>Receitas menos despesas</p></div></div><div id="dash-result-card" class="result-card"></div></article>
+</section>
+
 <section id="extra-page" hidden></section>
 <footer>Contas · Suas finanças em boas mãos <span>Seus dados devem permanecer privados e seguros.</span></footer>
 </main>
