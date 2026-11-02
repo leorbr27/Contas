@@ -258,31 +258,37 @@
     const range = dashboardDateRange();
     const start = new Date(range.from + 'T00:00:00');
     const finish = new Date(range.to + 'T00:00:00');
-    const expenseRows = (dashboardRows || transactions).filter(t => t.kind === 'expense');
-    const buckets = [];
-    for (let day = new Date(start); day <= finish; day.setDate(day.getDate() + 1)) {
-      const date = new Date(day);
-      const key = [date.getFullYear(), String(date.getMonth()+1).padStart(2,'0'), String(date.getDate()).padStart(2,'0')].join('-');
-      const total = expenseRows.filter(t => String(t.transaction_date || '').slice(0,10) === key)
-        .reduce((sum,t) => sum + Number(t.amount), 0);
-      buckets.push({ day: date.getDate(), total });
-    }
-    const max = Math.max(1, ...buckets.map(b => b.total));
-    const chart = $('#chart-bars');
-    chart.classList.add('daily-bar-chart');
-    chart.style.setProperty('--bar-count', Math.max(1, buckets.length));
-    chart.innerHTML = buckets.map(b =>
-      '<div class="daily-bar-column" title="Dia ' + b.day + ': ' + money(b.total) + '">' +
-        '<strong class="daily-bar-value">' + (b.total ? money(b.total).replace(',00','') : '—') + '</strong>' +
-        '<div class="daily-bar-track"><i style="height:' + (b.total / max * 100) + '%"></i></div>' +
-        '<span class="daily-bar-day">' + b.day + '</span>' +
-      '</div>'
-    ).join('') || '<p class="empty-state">Sem dias neste período.</p>';
-    const totalOut = buckets.reduce((sum,b) => sum + b.total, 0);
-    const insight = $('#flow-chart-insight');
-    if (insight) insight.textContent = totalOut
-      ? 'Total de despesas no período: ' + money(totalOut) + '. Cada barra representa o valor gasto em um dia.'
-      : 'Ainda não há despesas neste período.';
+    const rows = dashboardRows || transactions;
+    const renderDailySeries = (kind, targetSelector, insightSelector, noun, color) => {
+      const dailyRows = rows.filter(t => t.kind === kind);
+      const buckets = [];
+      for (let day = new Date(start); day <= finish; day.setDate(day.getDate() + 1)) {
+        const date = new Date(day);
+        const key = [date.getFullYear(), String(date.getMonth()+1).padStart(2,'0'), String(date.getDate()).padStart(2,'0')].join('-');
+        const total = dailyRows.filter(t => String(t.transaction_date || '').slice(0,10) === key)
+          .reduce((sum,t) => sum + Number(t.amount), 0);
+        buckets.push({ day: date.getDate(), total });
+      }
+      const max = Math.max(1, ...buckets.map(b => b.total));
+      const chart = $(targetSelector);
+      if (!chart) return;
+      chart.classList.add('daily-bar-chart');
+      chart.style.setProperty('--bar-count', Math.max(1, buckets.length));
+      chart.innerHTML = buckets.map(b =>
+        '<div class="daily-bar-column" title="Dia ' + b.day + ': ' + money(b.total) + '">' +
+          '<strong class="daily-bar-value">' + (b.total ? money(b.total).replace(',00','') : '—') + '</strong>' +
+          '<div class="daily-bar-track"><i style="height:' + (b.total / max * 100) + '%;background:' + color + '"></i></div>' +
+          '<span class="daily-bar-day">' + b.day + '</span>' +
+        '</div>'
+      ).join('') || '<p class="empty-state">Sem dias neste período.</p>';
+      const total = buckets.reduce((sum,b) => sum + b.total, 0);
+      const insight = $(insightSelector);
+      if (insight) insight.textContent = total
+        ? 'Total de ' + noun + ' no período: ' + money(total) + '. Cada barra representa o valor ' + (kind === 'income' ? 'recebido' : 'gasto') + ' em um dia.'
+        : 'Ainda não há ' + noun + ' neste período.';
+    };
+    renderDailySeries('expense', '#chart-bars', '#flow-chart-insight', 'despesas', '#e4a18f');
+    renderDailySeries('income', '#income-chart-bars', '#income-chart-insight', 'receitas', '#27865d');
     const legend = $('#flow-chart-legend');
     if (legend) legend.innerHTML = '<span><i class="legend-expense"></i> Despesas por dia</span>';
   }
