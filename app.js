@@ -205,8 +205,48 @@
     $('#total-balance').textContent = money(balanceAccounts.reduce((sum,a)=>sum+(a.type==='credit_card'?-getBalance(a):getBalance(a)),0));
     const result = income-expense, savings = income > 0 ? result/income*100 : 0;
     $('#dashboard-filter-summary').textContent = 'Exibindo '+dashboardRows.length+' lançamento(s), de '+new Date(dashboardDateRange().from+'T00:00:00').toLocaleDateString('pt-BR')+' até '+new Date(dashboardDateRange().to+'T00:00:00').toLocaleDateString('pt-BR')+'.';
-    renderTransactions(); renderCategories(dashboardRows, 'expense', '#category-list'); renderCategories(dashboardRows, 'income', '#income-category-list'); renderChart(); renderAccountsPage(); renderDashboardInsights(dashboardRows,income,expense,result,savings);
+    renderTransactions(); renderCategories(dashboardRows, 'expense', '#category-list'); renderCategories(dashboardRows, 'income', '#income-category-list'); renderChart(); renderAccountsPage(); renderDashboardInsights(dashboardRows,income,expense,result,savings); renderSmartFinance(dashboardRows,income,expense,result);
   }
+
+  function renderSmartFinance(rows,income,expense,result) {
+    const range=dashboardDateRange();
+    const parseDate=value=>new Date(String(value).slice(0,10)+'T00:00:00');
+    const days=Math.max(1,Math.round((parseDate(range.to)-parseDate(range.from))/86400000)+1);
+    const previousEnd=new Date(parseDate(range.from)); previousEnd.setDate(previousEnd.getDate()-1);
+    const previousStart=new Date(previousEnd); previousStart.setDate(previousStart.getDate()-days+1);
+    const iso=d=>[d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+    const previous=transactions.filter(t=>{const d=String(t.transaction_date||'').slice(0,10);return d>=iso(previousStart)&&d<=iso(previousEnd);});
+    const prevIncome=previous.filter(t=>t.kind==='income').reduce((s,t)=>s+Number(t.amount),0);
+    const prevExpense=previous.filter(t=>t.kind==='expense').reduce((s,t)=>s+Number(t.amount),0);
+    const pct=(current,old)=>old>0?((current-old)/old*100):null;
+    const expenseChange=pct(expense,prevExpense), incomeChange=pct(income,prevIncome);
+    const cashAccounts=accounts.filter(a=>a.type!=='credit_card');
+    const cashBalance=cashAccounts.reduce((s,a)=>s+getBalance(a),0);
+    const unpaid=transactions.filter(t=>!t.paid&&t.kind==='expense'&&accounts.find(a=>a.id===t.account_id)?.type!=='credit_card').reduce((s,t)=>s+Number(t.amount),0);
+    const cardDebt=accounts.filter(a=>a.type==='credit_card').reduce((s,a)=>s+Math.max(0,getBalance(a)),0);
+    const available=cashBalance-unpaid-cardDebt;
+    const monthStart=new Date(new Date().getFullYear(),new Date().getMonth(),1);
+    const nextMonth=new Date(new Date().getFullYear(),new Date().getMonth()+1,1);
+    const now=new Date();
+    const elapsed=Math.max(1,Math.min(now.getDate(),new Date(now.getFullYear(),now.getMonth()+1,0).getDate()));
+    const monthDays=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
+    const monthKey=iso(monthStart).slice(0,7);
+    const monthExpenses=transactions.filter(t=>t.kind==='expense'&&t.paid&&String(t.transaction_date||'').slice(0,7)===monthKey).reduce((s,t)=>s+Number(t.amount),0);
+    const projection=monthExpenses/elapsed*monthDays;
+    const projectionValid=now>=monthStart&&now<nextMonth&&monthExpenses>0;
+    $('#smart-available').textContent=money(available);
+    $('#smart-pending').textContent=money(unpaid);
+    $('#smart-card-debt').textContent=money(cardDebt);
+    $('#smart-projection').textContent=projectionValid?money(projection):'—';
+    $('#smart-projection-note').textContent=projectionValid?'Estimativa pelo ritmo de despesas pagas neste mês':'Ainda não há dados suficientes para projetar';
+    const expenseText=expenseChange===null?'Não há período anterior com despesas para comparar.':(expenseChange>0?'As despesas aumentaram ':'As despesas diminuíram ')+Math.abs(expenseChange).toFixed(1).replace('.',',')+'% em relação ao período anterior.';
+    const incomeText=incomeChange===null?'Ainda não há base anterior de receitas.':(incomeChange>0?'As receitas cresceram ':'As receitas caíram ')+Math.abs(incomeChange).toFixed(1).replace('.',',')+'% no comparativo.';
+    $('#smart-comparison').innerHTML='<p>'+esc(expenseText)+'</p><p>'+esc(incomeText)+'</p>';
+    const ratio=income>0?expense/income*100:null;
+    let health=ratio===null?'Não há receitas no período selecionado para calcular o comprometimento da renda.':ratio>100?'As despesas superaram as receitas no período. Revise os gastos e lançamentos pendentes.':ratio>=80?'As despesas consumiram '+ratio.toFixed(1).replace('.',',')+'% das receitas; sua margem está apertada.':'As despesas consumiram '+ratio.toFixed(1).replace('.',',')+'% das receitas, deixando uma margem de '+(100-ratio).toFixed(1).replace('.',',')+'%.';
+    $('#smart-health').innerHTML='<p>'+esc(health)+'</p><p>Resultado do período: <strong class="'+(result>=0?'positive':'amount-expense')+'">'+money(result)+'</strong>.</p>';
+  }
+
   function renderDashboardInsights(rows,income,expense,result,savings) {
     const accountTotals = {};
     rows.filter(t=>t.kind==='expense').forEach(t=>{ const a=accounts.find(x=>x.id===t.account_id); const name=t.account_name||a?.name||'Conta não identificada'; accountTotals[name]=(accountTotals[name]||0)+Number(t.amount); });
@@ -423,6 +463,7 @@
     $('.welcome').hidden = !overview;
     $('.dashboard-filters').hidden = !overview;
     $('.dashboard-insights').hidden = !overview;
+    $('.smart-finance').hidden = !overview;
     $('.metrics').hidden = !overview;
     $('.content-grid').hidden = !overview;
     $('.transactions-panel').hidden = !(overview || all);

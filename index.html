@@ -54,6 +54,22 @@
 </section>
 <section class="panel transactions-panel"><div class="panel-heading"><div><h3>Últimos lançamentos</h3><p>Movimentações recentes da sua vida financeira</p></div><button class="text-btn" data-page="lancamentos">Ver lançamentos ↗</button></div><div class="table-wrap"><table><thead><tr><th>DESCRIÇÃO</th><th>CATEGORIA</th><th>DATA</th><th>CONTA</th><th>VALOR</th></tr></thead><tbody id="recent-list"><tr><td colspan="5" class="empty-state">Nenhum lançamento cadastrado. Clique em “Novo lançamento” para começar.</td></tr></tbody></table></div></section>
 
+
+<section class="smart-finance" id="smart-finance">
+  <div class="smart-heading"><div><span class="eyebrow">INTELIGÊNCIA FINANCEIRA</span><h3>Seu dinheiro em perspectiva</h3><p>Indicadores calculados a partir dos lançamentos registrados.</p></div><span class="smart-live">Atualizado com seus lançamentos</span></div>
+  <div class="smart-metrics">
+    <article class="smart-card available"><span>Disponível estimado</span><strong id="smart-available">—</strong><small>Contas e cartões alimentação, menos compromissos e faturas</small></article>
+    <article class="smart-card pending"><span>Compromissos pendentes</span><strong id="smart-pending">—</strong><small>Despesas ainda não pagas, fora cartões de crédito</small></article>
+    <article class="smart-card debt"><span>Faturas em aberto</span><strong id="smart-card-debt">—</strong><small>Compras no crédito menos pagamentos registrados</small></article>
+    <article class="smart-card pace"><span>Projeção de despesas</span><strong id="smart-projection">—</strong><small id="smart-projection-note">Estimativa pelo ritmo de gastos do mês</small></article>
+  </div>
+  <div class="smart-analysis-grid">
+    <article class="smart-analysis"><h4>O que mudou no período?</h4><div id="smart-comparison" class="smart-copy">A análise será exibida quando houver movimentações.</div></article>
+    <article class="smart-analysis"><h4>Leitura da sua saúde financeira</h4><div id="smart-health" class="smart-copy">A análise será exibida quando houver movimentações.</div></article>
+  </div>
+  <p class="smart-footnote">Os indicadores dependem dos lançamentos cadastrados. A projeção é uma estimativa, não uma garantia; confira os saldos com os bancos e cartões.</p>
+</section>
+
 <section class="dashboard-insights">
   <article class="panel insight-panel"><div class="panel-heading"><div><h3>Despesas por conta</h3><p>Distribuição das saídas no período</p></div></div><div id="dash-account-breakdown" class="insight-list"></div></article>
   <article class="panel insight-panel"><div class="panel-heading"><div><h3>Maiores despesas</h3><p>Seus maiores lançamentos de saída</p></div></div><div id="dash-top-expenses" class="insight-list"></div></article>
