@@ -286,13 +286,11 @@
       const total = buckets.reduce((sum,b) => sum + b.total, 0);
       const insight = $(insightSelector);
       if (insight) insight.textContent = total
-        ? 'Total de ' + noun + ' no período: ' + money(total) + '. Cada barra representa o valor ' + (kind === 'income' ? 'recebido' : 'gasto') + ' em um dia.'
+        ? 'Total de ' + noun + ' no período: ' + money(total) + '.'
         : 'Ainda não há ' + noun + ' neste período.';
     };
     renderDailySeries('expense', '#chart-bars', '#flow-chart-insight', 'despesas', '#e4a18f');
     renderDailySeries('income', '#income-chart-bars', '#income-chart-insight', 'receitas', '#27865d');
-    const legend = $('#flow-chart-legend');
-    if (legend) legend.innerHTML = '<span><i class="legend-expense"></i> Despesas por dia</span>';
   }
   function renderAccountsPage() {
     const target = $('#accounts-list');
