@@ -205,7 +205,7 @@
     $('#total-balance').textContent = money(balanceAccounts.reduce((sum,a)=>sum+(a.type==='credit_card'?-getBalance(a):getBalance(a)),0));
     const result = income-expense, savings = income > 0 ? result/income*100 : 0;
     $('#dashboard-filter-summary').textContent = 'Exibindo '+dashboardRows.length+' lançamento(s), de '+new Date(dashboardDateRange().from+'T00:00:00').toLocaleDateString('pt-BR')+' até '+new Date(dashboardDateRange().to+'T00:00:00').toLocaleDateString('pt-BR')+'.';
-    renderTransactions(); renderCategories(dashboardRows); renderChart(); renderAccountsPage(); renderDashboardInsights(dashboardRows,income,expense,result,savings);
+    renderTransactions(); renderCategories(dashboardRows, 'expense', '#category-list'); renderCategories(dashboardRows, 'income', '#income-category-list'); renderChart(); renderAccountsPage(); renderDashboardInsights(dashboardRows,income,expense,result,savings);
   }
   function renderDashboardInsights(rows,income,expense,result,savings) {
     const accountTotals = {};
@@ -238,9 +238,9 @@
     const accountLabel = transfer ? (t.transfer_from_account_name || '—') + ' → ' + (t.transfer_to_account_name || '—') : (t.account_name || acc?.name || '—');
     return '<tr><td>' + esc(t.description) + '</td><td><span class="pill">' + esc(transfer ? 'Transferência' : t.category_name || cat?.name || 'Sem categoria') + '</span></td><td>' + esc(date) + '</td><td>' + esc(accountLabel) + '</td><td class="' + amountClass + '">' + sign + money(t.amount) + (t.paid ? '' : ' <small>(pendente)</small>') + '</td>' + actions + '</tr>';
   }
-  function renderCategories(current) {
+  function renderCategories(current, kind = 'expense', targetSelector = '#category-list') {
     const grouped = {};
-    current.filter(t => t.kind === 'expense').forEach(t => {
+    current.filter(t => t.kind === kind).forEach(t => {
       const category = categories.find(c => c.id === t.category_id);
       const name = t.category_name || category?.name || 'Sem categoria';
       grouped[name] = (grouped[name] || 0) + Number(t.amount);
@@ -250,9 +250,11 @@
     const colors = ['#23845b','#e2a18d','#6b8fc7','#d2a64b','#8b79b8','#55a6a0','#a0aa9f'];
     const stops = []; let cursor = 0;
     groups.forEach(([name,value],i)=>{ const end=total ? cursor+value/total*100 : cursor; stops.push(colors[i]+' '+cursor+'% '+end+'%'); cursor=end; });
-    const chart = $('#category-list');
-    if (!groups.length) { chart.innerHTML='<p class="empty-state">Não há despesas neste período para montar a distribuição.</p>'; return; }
-    chart.innerHTML='<div class="category-visual"><div class="category-donut" style="background:conic-gradient('+stops.join(',')+')"><div class="category-donut-center"><strong>'+money(total)+'</strong><small>Total gasto</small></div></div><div class="category-legend">'+groups.map(([name,value],i)=>'<div class="category-legend-row"><i style="background:'+colors[i]+'"></i><span>'+esc(name)+'</span><strong>'+((value/total)*100).toFixed(1).replace('.',',')+'% · '+money(value)+'</strong></div>').join('')+'</div></div>';
+    const chart = $(targetSelector);
+    const noun = kind === 'income' ? 'receitas' : 'despesas';
+    const totalLabel = kind === 'income' ? 'Total recebido' : 'Total gasto';
+    if (!groups.length) { chart.innerHTML='<p class="empty-state">Não há '+noun+' neste período para montar a distribuição.</p>'; return; }
+    chart.innerHTML='<div class="category-visual"><div class="category-donut" style="background:conic-gradient('+stops.join(',')+')"><div class="category-donut-center"><strong>'+money(total)+'</strong><small>'+totalLabel+'</small></div></div><div class="category-legend">'+groups.map(([name,value],i)=>'<div class="category-legend-row"><i style="background:'+colors[i]+'"></i><span>'+esc(name)+'</span><strong>'+((value/total)*100).toFixed(1).replace('.',',')+'% · '+money(value)+'</strong></div>').join('')+'</div></div>';
   }
   function renderChart() {
     const range = dashboardDateRange();
