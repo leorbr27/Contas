@@ -365,3 +365,81 @@ footer{font-size:14px;padding-top:28px}
 .category-charts-stack{display:grid;grid-template-columns:minmax(0,1fr);align-content:start;gap:18px;min-width:0}
 .category-charts-stack>.panel{min-width:0}
 @media(max-width:1000px){.category-charts-stack{gap:14px}}
+
+
+/* Identidade visual renovada — Contas */
+:root{
+  --ink:#172b35;
+  --muted:#627681;
+  --line:#dce7e8;
+  --bg:#edf3f3;
+  --green:#16745d;
+  --deep:#123d4a;
+  --mint:#e2f2eb;
+  --coral:#d56f62;
+  --amber:#c28a36;
+  --blue:#397a9b;
+}
+body{background:linear-gradient(135deg,#f0f5f4 0%,#edf2f6 52%,#f5f1eb 100%);color:#172b35}
+.sidebar{background:linear-gradient(180deg,#123d4a 0%,#164b50 100%);border-right:0;box-shadow:5px 0 24px #173b2912}
+.brand{color:#fff}
+.brand small{color:#b9d4d1}
+.brand-icon{background:linear-gradient(145deg,#42a98a,#23745f);box-shadow:0 5px 14px #061f2a55}
+.brand-dot{color:#f0bf70}
+.nav-item{color:#c2d7d6}
+.nav-item:hover{background:#ffffff12;color:#fff}
+.nav-item.active{background:linear-gradient(90deg,#d8eee5,#e8f4ee);color:#145b4a;box-shadow:inset 3px 0 #e3b56c}
+.sidebar-bottom{border-color:#ffffff25;color:#f3fbf8}
+.sidebar-bottom small{color:#bfd5d1}
+.help-icon{border-color:#ffffff55;color:#e4f4ef}
+.main{background:transparent}
+.topbar h1{color:#153b45;letter-spacing:-1.2px}
+.topbar .eyebrow{color:#66858a}
+.month-picker-label{border-color:#d5e3e2;background:#fff;box-shadow:0 3px 12px #193c4210}
+.primary-btn{background:linear-gradient(135deg,#19765f,#145b58);box-shadow:0 5px 14px #176b4d30}
+.primary-btn:hover{background:linear-gradient(135deg,#145f4e,#104c4b)}
+.welcome{background:linear-gradient(112deg,#123d4a 0%,#17675e 58%,#31866b 100%);box-shadow:0 12px 30px #174c4930;border:1px solid #ffffff20}
+.welcome:after{content:"";position:absolute;width:330px;height:330px;border-radius:50%;right:185px;top:-220px;background:#ffffff0b;border:1px solid #ffffff20;pointer-events:none}
+.welcome h2{color:#fff;letter-spacing:-1.1px}
+.welcome p{color:#d5e9e5}
+.light{color:#a9d9c5}
+.art-card{background:#ffffff20;border-color:#ffffff50;box-shadow:0 12px 28px #092f2c25}
+.metrics{gap:16px}
+.metric-card{border:1px solid #dce7e8;box-shadow:0 5px 18px #173b2910;transition:transform .18s ease,box-shadow .18s ease}
+.metric-card:hover{transform:translateY(-2px);box-shadow:0 10px 24px #173b2918}
+.metric-card:nth-child(1){background:linear-gradient(145deg,#e3f2ed 0%,#f7fbf8 100%);border-color:#c9e4d9}
+.metric-card:nth-child(2){background:linear-gradient(145deg,#e3f1f7 0%,#f8fbfd 100%);border-color:#c9e0eb}
+.metric-card:nth-child(3){background:linear-gradient(145deg,#fae9e5 0%,#fff9f7 100%);border-color:#efd5cf}
+.metric-card:nth-child(4){background:linear-gradient(145deg,#f8f0df 0%,#fffdf8 100%);border-color:#ecdfc2}
+.metric-card:nth-child(1) .metric-icon{background:#cce8dc;color:#176b54}
+.metric-card:nth-child(2) .metric-icon{background:#d1e8f2;color:#2d7695}
+.metric-card:nth-child(3) .metric-icon{background:#f5d8d1;color:#bd6254}
+.metric-card:nth-child(4) .metric-icon{background:#f0e1bd;color:#a87525}
+.metric-card strong{color:#173a43}
+.metric-card .positive{color:#17765a}
+.panel{background:linear-gradient(155deg,#fff 0%,#fbfdfc 100%);border:1px solid #dce7e8;box-shadow:0 5px 18px #173b290c}
+.panel-heading h3{color:#183d46;letter-spacing:-.25px}
+.panel-heading p{color:#71858a}
+.chart-insight{background:linear-gradient(100deg,#e3f2ec,#eaf3f6);border:1px solid #d7e9e3;color:#245c50}
+.flow-track{background:#e8efed}
+.flow-income{background:linear-gradient(90deg,#4ba985,#16745d)}
+.flow-expense{background:linear-gradient(90deg,#efb2a3,#d47768)}
+.category-track{background:#e8efed}
+.category-track i{background:linear-gradient(90deg,#4aa886,#176b59)}
+.category-icon{background:#e6f1ed;color:#216b59}
+.category-donut{filter:drop-shadow(0 5px 10px #173b2912)}
+.insight-row{border-color:#e7eeee}
+.text-btn{color:#176b60}
+.transactions-panel th{color:#668087}
+.transactions-panel td{border-color:#eaf0ef}
+.pill{background:#e5f1ed;color:#246b58}
+footer{color:#70858a}
+.dashboard-filters{background:linear-gradient(140deg,#ffffff,#f5faf8)}
+.dashboard-filter-toggle strong{color:#173e47}
+.dashboard-filter-toggle-actions{color:#176b60}
+.dialog-head .eyebrow{color:#63848a}
+@media(max-width:700px){
+ .sidebar{background:linear-gradient(90deg,#123d4a,#17675e);box-shadow:0 4px 16px #123d4a20}
+ .welcome{background:linear-gradient(120deg,#123d4a,#17675e)}
+ .metric-card{box-shadow:0 4px 12px #173b2910}
+}
