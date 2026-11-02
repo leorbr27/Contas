@@ -15,7 +15,8 @@ module.exports = async function handler(req, res) {
         ('Lanche', 'expense', '#f59e0b', 'utensils', true),
         ('Impostos e taxas', 'expense', '#64748b', 'receipt', true),
         ('Reembolso', 'income', '#0d9488', 'wallet', true),
-        ('Vendas', 'income', '#16a34a', 'shopping-bag', true)
+        ('Vendas', 'income', '#16a34a', 'shopping-bag', true),
+        ('Presentes e doações', 'expense', '#ec4899', 'gift', true)
       ON CONFLICT (name, kind) DO NOTHING
     `);
     const result = await db.query('SELECT id, name, kind, color, icon, is_default FROM public.categories ORDER BY kind, name');
