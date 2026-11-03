@@ -257,8 +257,9 @@
     $('#dash-result-card').innerHTML='<strong class="'+(result>=0?'positive':'amount-expense')+'">'+money(result)+'</strong><div class="result-meta"><span>Receitas: '+money(income)+'</span><span>Despesas: '+money(expense)+'</span><span>Economia sobre receitas: '+(Number.isFinite(savings)?savings.toFixed(1).replace('.',','):'0,0')+'%</span></div>';
   }
   function renderTransactions() {
-    const list = [...(dashboardRows || transactions)].sort((a, b) => String(b.transaction_date).localeCompare(String(a.transaction_date)));
     const allPage = document.querySelector('.nav-item.active')?.dataset.page === 'lancamentos';
+    const source = allPage ? transactions : (dashboardRows || transactions);
+    const list = [...source].sort((a, b) => String(b.transaction_date).localeCompare(String(a.transaction_date)));
     const visible = allPage ? list : list.slice(0, 7);
     $('#recent-list').innerHTML = visible.length ? visible.map(t => transactionRow(t)).join('') :
       '<tr><td colspan="6" class="empty-state">' + (allPage ? 'Nenhum lançamento encontrado no período selecionado.' : 'Nenhum lançamento cadastrado. Clique em “Novo lançamento” para começar.') + '</td></tr>';
