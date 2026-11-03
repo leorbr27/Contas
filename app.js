@@ -20,6 +20,10 @@
     .auth-foot{font-size:12px;color:#64748b;margin-top:16px;text-align:center}
     #logout-button{margin-left:8px}.api-error-banner{padding:12px 16px;border-radius:10px;background:#fff1f2;color:#9f1239;margin:12px 0}
     .row-actions{white-space:nowrap}.danger-btn{color:#b91c1c}
+    .transaction-clickable-row{cursor:pointer}.transaction-clickable-row:hover{background:#f1f7f3}.transaction-clickable-row:focus{outline:2px solid #27865d;outline-offset:-2px}
+    #transaction-details-dialog{width:min(92vw,520px);max-height:85vh;overflow:auto;border:0;border-radius:18px;padding:24px;box-shadow:0 24px 70px rgba(0,0,0,.24)}
+    #transaction-details-dialog::backdrop{background:rgba(8,25,20,.58);backdrop-filter:blur(3px)}
+    .transaction-details-list{display:flex;flex-direction:column;gap:0;margin:18px 0}.transaction-detail-item{display:flex;flex-direction:column;gap:5px;padding:13px 0;border-bottom:1px solid #e8eee9}.transaction-detail-item span{font-size:13px;color:#64748b}.transaction-detail-item strong{font-size:16px;color:#172a23;overflow-wrap:anywhere}
   `;
   document.head.appendChild(authStyles);
 
@@ -277,7 +281,35 @@
     const sign = t.kind === 'income' ? '+ ' : t.kind === 'expense' ? '− ' : '↔ ';
     const amountClass = t.kind === 'income' ? 'amount-income' : t.kind === 'expense' ? 'amount-expense' : '';
     const accountLabel = transfer ? (t.transfer_from_account_name || '—') + ' → ' + (t.transfer_to_account_name || '—') : (t.account_name || acc?.name || '—');
-    return '<tr><td>' + esc(t.description) + '</td><td><span class="pill">' + esc(transfer ? 'Transferência' : t.category_name || cat?.name || 'Sem categoria') + '</span></td><td>' + esc(date) + '</td><td>' + esc(accountLabel) + '</td><td class="' + amountClass + '">' + sign + money(t.amount) + (t.paid ? '' : ' <small>(pendente)</small>') + '</td>' + actions + '</tr>';
+    return '<tr class="transaction-clickable-row" data-view="' + esc(t.id) + '" tabindex="0" role="button" aria-label="Ver detalhes de ' + esc(t.description) + '"><td>' + esc(t.description) + '</td><td><span class="pill">' + esc(transfer ? 'Transferência' : t.category_name || cat?.name || 'Sem categoria') + '</span></td><td>' + esc(date) + '</td><td>' + esc(accountLabel) + '</td><td class="' + amountClass + '">' + sign + money(t.amount) + (t.paid ? '' : ' <small>(pendente)</small>') + '</td>' + actions + '</tr>';
+  }
+  function showTransactionDetails(t) {
+    const cat = categories.find(c => c.id === t.category_id);
+    const acc = accounts.find(a => a.id === t.account_id);
+    const transfer = t.kind === 'transfer';
+    const date = String(t.transaction_date || '').slice(0,10).split('-').reverse().join('/');
+    const details = [
+      ['Tipo', transfer ? 'Transferência' : t.kind === 'income' ? 'Receita' : 'Despesa'],
+      ['Descrição', t.description || '—'],
+      ['Valor', money(t.amount)],
+      ['Data', date || '—'],
+      ['Categoria', transfer ? 'Não se aplica' : t.category_name || cat?.name || 'Sem categoria'],
+      ['Conta', transfer ? (t.transfer_from_account_name || '—') + ' → ' + (t.transfer_to_account_name || '—') : t.account_name || acc?.name || '—'],
+      ['Situação', transfer || t.paid ? 'Pago/recebido' : 'Pendente'],
+      ['Observações', t.notes || 'Nenhuma observação']
+    ];
+    let modal = $('#transaction-details-dialog');
+    if (!modal) {
+      modal = document.createElement('dialog');
+      modal.id = 'transaction-details-dialog';
+      modal.innerHTML = '<div class="dialog-head"><div><div class="eyebrow">DETALHES DA MOVIMENTAÇÃO</div><h2>Detalhes do lançamento</h2></div><button type="button" class="close-btn" data-close-details aria-label="Fechar">×</button></div><div class="transaction-details-list"></div><div class="dialog-actions"><button type="button" class="secondary-btn" data-close-details>Fechar</button></div>';
+      document.body.appendChild(modal);
+      modal.addEventListener('click', event => {
+        if (event.target.closest('[data-close-details]')) modal.close();
+      });
+    }
+    modal.querySelector('.transaction-details-list').innerHTML = details.map(([label,value]) => '<div class="transaction-detail-item"><span>' + esc(label) + '</span><strong>' + esc(value) + '</strong></div>').join('');
+    if (typeof modal.showModal === 'function') modal.showModal(); else modal.setAttribute('open','');
   }
   function renderCategories(current, kind = 'expense', targetSelector = '#category-list') {
     const grouped = {};
@@ -432,6 +464,12 @@
     if (payCard) {
       const card = accounts.find(a => a.id === payCard.dataset.payCard);
       if (card) openDialog({ kind: 'transfer', description: 'Pagamento da fatura - ' + card.name, amount: '', transaction_date: today(), paid: true, transfer_to_account_id: card.id });
+      return;
+    }
+    const view = event.target.closest('[data-view]');
+    if (view && !event.target.closest('[data-edit], [data-delete]')) {
+      const transaction = transactions.find(t => t.id === view.dataset.view);
+      if (transaction) showTransactionDetails(transaction);
       return;
     }
     const edit = event.target.closest('[data-edit]');
