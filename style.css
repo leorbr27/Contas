@@ -495,3 +495,62 @@ footer{color:#70858a}
 @media(max-width:700px){
   .sidebar{background:linear-gradient(90deg,#293f59,#354f68);box-shadow:0 4px 16px #20384a25}
 }
+
+
+/* Ajustes do cabeçalho para iPhone: mês em linha própria e ações lado a lado. */
+@media(max-width:700px){
+  .topbar{
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:11px;
+  }
+  .topbar>div:first-child{min-width:0}
+  .topbar h1{
+    white-space:nowrap;
+    overflow:visible;
+    font-size:clamp(23px,6.8vw,29px);
+    line-height:1.2;
+  }
+  .top-actions{
+    width:100%;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    grid-template-areas:"month month" "new logout";
+    gap:8px;
+    align-items:stretch;
+  }
+  .month-picker-label{
+    grid-area:month;
+    width:100%;
+    min-height:46px;
+    justify-content:space-between;
+    padding:0 13px;
+  }
+  .month-picker-label .month-picker{
+    flex:1;
+    min-width:0;
+    text-align:center;
+    font-size:15px;
+  }
+  #new-transaction{
+    grid-area:new;
+    width:100%;
+    min-height:46px;
+    background:linear-gradient(135deg,#19765f,#145b58);
+    color:#fff;
+    font-size:15px;
+    font-weight:800;
+    padding:11px 14px;
+  }
+  #logout-button{
+    grid-area:logout;
+    width:auto;
+    min-width:76px;
+    min-height:46px;
+    margin:0;
+    padding:9px 13px;
+    font-size:13px;
+    align-self:stretch;
+  }
+}
