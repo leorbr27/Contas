@@ -470,3 +470,28 @@ footer{color:#70858a}
 @media(max-width:1050px){.smart-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:700px){.smart-finance{padding:17px 14px;margin:14px 0}.smart-heading{display:block}.smart-live{display:inline-block;margin-top:10px}.smart-heading h3{font-size:20px}.smart-metrics{gap:9px}.smart-card{padding:13px 11px}.smart-card>span{font-size:12px}.smart-card strong{font-size:18px}.smart-card small{font-size:11px}.smart-analysis-grid{grid-template-columns:1fr;gap:9px}.smart-analysis{padding:14px}}
 @media(max-width:390px){.smart-metrics{grid-template-columns:1fr 1fr}.smart-card strong{font-size:16px}}
+
+
+/* Barra de navegação: azul ardósia sofisticado, em harmonia com a paleta do dashboard. */
+.sidebar{
+  background:linear-gradient(180deg,#293f59 0%,#354f68 100%);
+  border-right:0;
+  box-shadow:5px 0 24px #20384a18;
+}
+.brand{color:#fff}
+.brand small{color:#c4d2df}
+.brand-icon{background:linear-gradient(145deg,#7aa5bd,#527e9b);box-shadow:0 5px 14px #14283c55}
+.brand-dot{color:#e9bd78}
+.nav-item{color:#d0dbe5}
+.nav-item:hover{background:#ffffff14;color:#fff}
+.nav-item.active{
+  background:linear-gradient(90deg,#e4edf4,#f0f4f7);
+  color:#294b63;
+  box-shadow:inset 3px 0 #d8aa65;
+}
+.sidebar-bottom{border-color:#ffffff2b;color:#f5f8fb}
+.sidebar-bottom small{color:#c7d5df}
+.help-icon{border-color:#ffffff65;color:#edf4f8}
+@media(max-width:700px){
+  .sidebar{background:linear-gradient(90deg,#293f59,#354f68);box-shadow:0 4px 16px #20384a25}
+}
