@@ -554,3 +554,13 @@ footer{color:#70858a}
     align-self:stretch;
   }
 }
+
+
+/* Cadastro de compras parceladas no cartão de crédito */
+.installment-field{margin:4px 0 12px;padding:13px 14px;border:1px solid #d6e7e1;border-radius:12px;background:linear-gradient(135deg,#f0f8f4,#f7fafc)}
+.installment-toggle{display:flex;align-items:center;gap:9px;font-weight:700;color:#245b50}
+.installment-toggle input{width:17px;height:17px;accent-color:#176b59}
+#installment-options{margin-top:12px}
+#installment-options label{display:block;font-weight:650;color:#385b5d}
+#installment-options select{display:block;width:100%;margin-top:6px}
+#installment-options small{display:block;margin-top:8px;color:#667d7d;font-size:12px;line-height:1.45}
