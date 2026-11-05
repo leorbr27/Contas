@@ -144,6 +144,19 @@
     $('#transfer-from-field').hidden = !transfer;
     $('#transfer-to-field').hidden = !transfer;
     $('.check-label').hidden = transfer;
+    updateInstallmentFields();
+  }
+
+  function updateInstallmentFields() {
+    const account = accounts.find(a => a.id === $('#account').value);
+    const eligible = !editingId && $('#kind').value === 'expense' && account?.type === 'credit_card';
+    $('#installment-field').hidden = !eligible;
+    if (!eligible) {
+      $('#installment-enabled').checked = false;
+      $('#installment-options').hidden = true;
+    } else {
+      $('#installment-options').hidden = !$('#installment-enabled').checked;
+    }
   }
   function getBalance(account) {
     const rows = transactions.filter(t => t.paid || (account.type === 'credit_card' && t.account_id === account.id && t.kind === 'expense'));
@@ -389,6 +402,9 @@
     populateSelects(transaction?.category_id, transaction?.account_id);
     if (transaction?.transfer_from_account_id) $('#transfer-from-account').value = transaction.transfer_from_account_id;
     if (transaction?.transfer_to_account_id) $('#transfer-to-account').value = transaction.transfer_to_account_id;
+    $('#installment-enabled').checked = false;
+    $('#installment-count').value = '2';
+    updateInstallmentFields();
     $('.dialog-head h2').textContent = editingId ? 'Editar lançamento' : 'Novo lançamento';
     form.querySelector('[type="submit"]').textContent = editingId ? 'Salvar alterações' : 'Salvar lançamento';
     if (typeof dialog.showModal === 'function') dialog.showModal(); else dialog.setAttribute('open', '');
@@ -419,6 +435,8 @@
   $('#close-dialog').addEventListener('click', closeDialog);
   $('#cancel-dialog').addEventListener('click', closeDialog);
   $('#kind').addEventListener('change', () => populateSelects());
+  $('#account').addEventListener('change', updateInstallmentFields);
+  $('#installment-enabled').addEventListener('change', updateInstallmentFields);
 
   form.addEventListener('submit', async event => {
     event.preventDefault();
@@ -434,9 +452,10 @@
       transfer_from_account_id: form.elements.kind.value === 'transfer' ? ($('#transfer-from-account').value || null) : null,
       transfer_to_account_id: form.elements.kind.value === 'transfer' ? ($('#transfer-to-account').value || null) : null,
       paid: form.elements.kind.value === 'transfer' ? true : (form.elements.paid.checked || accounts.find(a => a.id === form.elements.account_id.value)?.type === 'credit_card'),
-      notes: form.elements.notes.value.trim()
+      notes: form.elements.notes.value.trim(),
+      installment_count: $('#installment-enabled').checked ? Number($('#installment-count').value) : 1
     };
-    if (!data.description || !Number.isFinite(data.amount) || data.amount <= 0 || !data.transaction_date || (data.kind === 'transfer' && (!data.transfer_from_account_id || !data.transfer_to_account_id || data.transfer_from_account_id === data.transfer_to_account_id))) {
+    if (!data.description || !Number.isFinite(data.amount) || data.amount <= 0 || !data.transaction_date || (data.kind === 'transfer' && (!data.transfer_from_account_id || !data.transfer_to_account_id || data.transfer_from_account_id === data.transfer_to_account_id)) || (data.installment_count > 1 && (data.kind !== 'expense' || accounts.find(a => a.id === data.account_id)?.type !== 'credit_card'))) {
       notifyFormError('Preencha descrição, valor e data corretamente.');
       return;
     }
