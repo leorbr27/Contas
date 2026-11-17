@@ -68,7 +68,7 @@ INSERT INTO public.categories(name,kind,color,icon,is_default) VALUES
  ('Moradia','expense','#f97316','house',true),
  ('Alimentação','expense','#eab308','utensils',true),
  ('Transporte','expense','#3b82f6','car',true),
- ('Saúde','expense','#ec4899','heart-pulse',true),
+ ('Saúde e beleza','expense','#ec4899','heart-pulse',true),
  ('Educação','expense','#8b5cf6','book-open',true),
  ('Lazer','expense','#06b6d4','clapperboard',true),
  ('Contas da casa','expense','#64748b','receipt',true),
