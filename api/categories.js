@@ -8,6 +8,8 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Método não permitido.' });
   }
   try {
+    // Renomeia a categoria existente sem alterar os lançamentos vinculados pelo ID.
+    await db.query("UPDATE public.categories SET name = 'Saúde e beleza' WHERE name = 'Saúde' AND kind = 'expense'");
     // Inclui categorias de despesas e rendimentos sem duplicar registros existentes.
     await db.query(`
       INSERT INTO public.categories (name, kind, color, icon, is_default)
