@@ -149,7 +149,8 @@
 
   function updateInstallmentFields() {
     const account = accounts.find(a => a.id === $('#account').value);
-    const eligible = !editingId && $('#kind').value === 'expense' && account?.type === 'credit_card';
+    const kind = $('#kind').value;
+    const eligible = !editingId && (kind === 'income' || (kind === 'expense' && account?.type === 'credit_card'));
     $('#installment-field').hidden = !eligible;
     if (!eligible) {
       $('#installment-enabled').checked = false;
@@ -455,7 +456,7 @@
       notes: form.elements.notes.value.trim(),
       installment_count: $('#installment-enabled').checked ? Number($('#installment-count').value) : 1
     };
-    if (!data.description || !Number.isFinite(data.amount) || data.amount <= 0 || !data.transaction_date || (data.kind === 'transfer' && (!data.transfer_from_account_id || !data.transfer_to_account_id || data.transfer_from_account_id === data.transfer_to_account_id)) || (data.installment_count > 1 && (data.kind !== 'expense' || accounts.find(a => a.id === data.account_id)?.type !== 'credit_card'))) {
+    if (!data.description || !Number.isFinite(data.amount) || data.amount <= 0 || !data.transaction_date || (data.kind === 'transfer' && (!data.transfer_from_account_id || !data.transfer_to_account_id || data.transfer_from_account_id === data.transfer_to_account_id)) || (data.installment_count > 1 && data.kind !== 'income' && (data.kind !== 'expense' || accounts.find(a => a.id === data.account_id)?.type !== 'credit_card'))) {
       notifyFormError('Preencha descrição, valor e data corretamente.');
       return;
     }
