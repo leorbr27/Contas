@@ -25,7 +25,7 @@ function validate(body) {
   } else if (account_id && !validUuid(account_id)) return { error: 'Conta inválida.' };
   const installment_count = data.installment_count === undefined ? 1 : Number(data.installment_count);
   if (!Number.isInteger(installment_count) || installment_count < 1 || installment_count > 36) return { error: 'Escolha uma quantidade de parcelas entre 1 e 36.' };
-  if (installment_count > 1 && (kind !== 'expense' || !account_id)) return { error: 'Parcelamento disponível apenas para despesas vinculadas a um cartão de crédito.' };
+  if (installment_count > 1 && kind === 'expense' && !account_id) return { error: 'Selecione um cartão de crédito para parcelar a despesa.' };
   const notes = typeof data.notes === 'string' ? data.notes.trim().slice(0, 1000) : null;
   return { data: { kind, description, amount: Math.round(amount * 100) / 100, transaction_date, paid, category_id: kind === 'transfer' ? null : category_id, account_id: kind === 'transfer' ? null : account_id, transfer_from_account_id, transfer_to_account_id, notes, installment_count } };
 }
@@ -57,8 +57,10 @@ module.exports = async function handler(req, res) {
       if (d.installment_count > 1) {
         const client = await db.connect();
         try {
-          const account = await client.query('SELECT type FROM public.accounts WHERE id=$1', [d.account_id]);
-          if (!account.rowCount || account.rows[0].type !== 'credit_card') return res.status(400).json({ error: 'Selecione uma conta do tipo cartão de crédito para parcelar a compra.' });
+          if (d.kind === 'expense') {
+            const account = await client.query('SELECT type FROM public.accounts WHERE id=$1', [d.account_id]);
+            if (!account.rowCount || account.rows[0].type !== 'credit_card') return res.status(400).json({ error: 'Selecione uma conta do tipo cartão de crédito para parcelar a compra.' });
+          }
           await client.query('BEGIN');
           const totalCents = Math.round(d.amount * 100);
           const baseCents = Math.floor(totalCents / d.installment_count);
@@ -70,12 +72,13 @@ module.exports = async function handler(req, res) {
             const lastDay = new Date(Date.UTC(firstDay.getUTCFullYear(), firstDay.getUTCMonth() + 1, 0)).getUTCDate();
             const installmentDate = [firstDay.getUTCFullYear(), String(firstDay.getUTCMonth() + 1).padStart(2, '0'), String(Math.min(day, lastDay)).padStart(2, '0')].join('-');
             const installmentAmount = (baseCents + (index < remainder ? 1 : 0)) / 100;
+            const paid = d.kind === 'expense' || d.paid;
             const result = await client.query(
               `INSERT INTO public.transactions
                 (kind, description, amount, transaction_date, category_id, account_id, paid, paid_at, notes, updated_at)
-               VALUES ('expense',$1,$2,$3,$4,$5,true,now(),$6,now())
+               VALUES ($1,$2,$3,$4,$5,$6,$7,CASE WHEN $7 THEN now() ELSE NULL END,$8,now())
                RETURNING id, account_id, category_id, kind, description, amount, to_char(transaction_date,'YYYY-MM-DD') AS transaction_date, due_date, paid, paid_at, notes, created_at, updated_at`,
-              [d.description + ' (' + (index + 1) + '/' + d.installment_count + ')', installmentAmount, installmentDate, d.category_id, d.account_id, d.notes]
+              [d.kind, d.description + ' (' + (index + 1) + '/' + d.installment_count + ')', installmentAmount, installmentDate, d.category_id, d.account_id, paid, d.notes]
             );
             rows.push(result.rows[0]);
           }
